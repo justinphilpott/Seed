@@ -87,7 +87,8 @@ seed/                          ← seed tool source
 ├── CLAUDE.md                  ← Claude Code instructions
 ├── AGENTS.md                  ← Cross-agent context
 ├── CONTEXT.md (this file)
-└── BUILD.md                   ← Build guide and Go concepts
+├── BUILD.md                   ← Build guide and Go concepts
+└── LEARNINGS.md               ← Validated discoveries
 
 Scaffolded output (example):   ← what seed creates for users
 ├── README.md
