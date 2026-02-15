@@ -257,17 +257,17 @@ mkdir testcwd && cd testcwd
 
 **Add a new field** (e.g., `Author`):
 
-1. Add to `TemplateData` in [scaffold.go](scaffold.go:28-35):
+1. Add to the `TemplateData` struct in [scaffold.go](scaffold.go):
    ```go
    Author string
    ```
 
-2. Add to `WizardData` in [wizard.go](wizard.go:26-30):
+2. Add to the `WizardData` struct in [wizard.go](wizard.go):
    ```go
    Author string
    ```
 
-3. Add input in `RunWizard()` in [wizard.go](wizard.go:52-80):
+3. Add an input field inside `RunWizard()` in [wizard.go](wizard.go):
    ```go
    huh.NewInput().
        Title("Author").
@@ -275,7 +275,7 @@ mkdir testcwd && cd testcwd
        Validate(...),
    ```
 
-4. Map in `ToTemplateData()` in [wizard.go](wizard.go:128-136):
+4. Map the field in `ToTemplateData()` in [wizard.go](wizard.go):
    ```go
    Author: w.Author,
    ```
@@ -288,7 +288,7 @@ mkdir testcwd && cd testcwd
 ### Add a New Template
 
 1. Create `templates/NEWFILE.md.tmpl`
-2. Add to `coreTemplates` in [scaffold.go](scaffold.go:104-109):
+2. Add to `coreTemplates` slice in the `Scaffold()` method in [scaffold.go](scaffold.go):
    ```go
    "NEWFILE.md.tmpl",
    ```

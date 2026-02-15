@@ -7,12 +7,13 @@
 ## Current State (2026-02-15)
 
 ### ✅ Completed
-- **Ultra-minimal templates** (81 lines total across 5 files)
-- Templates stored in `templates/` directory
-- **Go CLI implementation** (3 files, ~500 lines with extensive comments)
+- **Ultra-minimal templates** across 5 files in `templates/`
+- **Go CLI implementation**:
   - `main.go` - CLI entry point and orchestration
   - `wizard.go` - Huh-based TUI wizard with validation
   - `scaffold.go` - Template rendering engine with embed.FS + programmatic devcontainer generation
+  - `scaffold_test.go` - Scaffold and template tests
+  - `wizard_test.go` - Wizard validation and data transformation tests
 - Template embedding via `go:embed`
 - Input validation (sensible bounds)
 - Directory safety checks (prevents overwrites)
@@ -48,15 +49,12 @@
 - `DevContainerImage` - MCR image tag, e.g. "go:2-1.25-trixie" (only if devcontainer opted in)
 - `AIChatContinuity` - Boolean, whether to enable AI chat continuity (only if devcontainer opted in)
 
-**Auto-generated**:
-- `Date` - Current date (YYYY-MM-DD)
-- `Year` - Current year
+_(Date and Year fields were removed — templates don't use them.)_
 
 ## Key Design Decisions
 
 ### Ultra-Minimal Philosophy
 - Templates are scaffolding to build on, not documentation homework
-- 48% reduction from initial version (155 → 81 lines)
 - Removed: TechStack, Author, "Last Updated" fields, Format sections, verbose guidelines
 - Kept: Clean examples, minimal placeholders, navigation links
 
@@ -78,14 +76,18 @@ seed/                          ← seed tool source
 │   └── TODO.md.tmpl
 ├── .devcontainer/
 │   └── devcontainer.json      ← seed's own devcontainer (for developing seed)
+├── .github/workflows/release.yml
 ├── main.go
 ├── wizard.go
 ├── scaffold.go
 ├── scaffold_test.go
+├── wizard_test.go
 ├── go.mod
 ├── Makefile
-├── .github/workflows/release.yml
-└── CONTEXT.md (this file)
+├── CLAUDE.md                  ← Claude Code instructions
+├── AGENTS.md                  ← Cross-agent context
+├── CONTEXT.md (this file)
+└── BUILD.md                   ← Build guide and Go concepts
 
 Scaffolded output (example):   ← what seed creates for users
 ├── README.md
@@ -130,3 +132,10 @@ Builds for linux/darwin (amd64/arm64) and windows (amd64) are published as GitHu
 ## Branch
 
 Current work on: `dev` branch
+
+## Maintaining These Docs
+
+When adding/removing source files, templates, or changing architecture, update:
+- The **Architecture** section in CLAUDE.md
+- The **file structure** diagram above
+- The **Key Files** section in AGENTS.md

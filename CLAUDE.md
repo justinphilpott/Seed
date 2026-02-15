@@ -23,7 +23,8 @@ go vet ./...         # Static analysis
 - **main.go** — CLI entry point, argument parsing, orchestration
 - **wizard.go** — TUI wizard (Charm Huh library), user input collection
 - **scaffold.go** — Template rendering (embed.FS + text/template), devcontainer generation (encoding/json)
-- **scaffold_test.go** — Tests
+- **scaffold_test.go** — Scaffold/template tests
+- **wizard_test.go** — Wizard validation and data transformation tests
 - **templates/*.tmpl** — Embedded project templates (README, AGENTS, DECISIONS, TODO, LEARNINGS)
 
 ## Key Patterns
@@ -33,6 +34,14 @@ go vet ./...         # Static analysis
 - Separation of concerns: wizard collects input, scaffold writes files, main orchestrates
 - Version injected at build time via `-ldflags "-X main.Version=$(VERSION)"`
 
+## Testing
+
+- Run: `make test` or `go test -count=1 ./...`
+- Table-driven tests with `t.Run()` subtests
+- Each test uses `tempDir(t)` helper for isolated temp directories (auto-cleaned)
+- scaffold_test.go: file existence, template content, devcontainer JSON validity, error handling, edge cases
+- wizard_test.go: input validation boundaries, `WizardData` → `TemplateData` conversion
+
 ## Branch
 
 Current work on: `dev` branch. Main branch: `main`.
@@ -40,3 +49,10 @@ Current work on: `dev` branch. Main branch: `main`.
 ## Releasing
 
 Push a git tag (e.g., `git tag v0.1.0 && git push origin v0.1.0`) to trigger GitHub Actions release builds.
+
+## Maintaining These Docs
+
+When adding/removing source files, templates, or changing architecture, update:
+- The **Architecture** section in this file
+- The **file structure** diagram in CONTEXT.md
+- The **Key Files** section in AGENTS.md
