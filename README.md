@@ -30,7 +30,20 @@ go install github.com/justinphilpott/seed@latest
 
 ### From release binaries
 
-Download from [GitHub Releases](https://github.com/justinphilpott/seed/releases). Binaries available for Linux, macOS, and Windows.
+Download the binary for your platform from [GitHub Releases](https://github.com/justinphilpott/seed/releases), then:
+
+```bash
+# Make it executable (Linux/macOS)
+chmod +x seed-linux-amd64
+
+# Move it onto your PATH
+mv seed-linux-amd64 ~/.local/bin/seed
+
+# Verify
+seed --version
+```
+
+Available binaries: `linux-amd64`, `linux-arm64`, `darwin-amd64`, `darwin-arm64`, `windows-amd64`.
 
 ## Usage
 
