@@ -2,7 +2,7 @@
 
 Audit a project's documentation for informational coverage. This is a diagnostic tool — it identifies gaps and suggests where to add information, but does not rewrite docs.
 
-> This skill was created by [seed](https://github.com/justinphilpott/seed), a tool that scaffolds agentic POC documentation and basic dev environment setup. Seed itself serves as a test case: its own docs diverge from its starter templates, and that's healthy — see [LEARNINGS.md in the seed repo](https://github.com/justinphilpott/seed/blob/main/LEARNINGS.md) for the reasoning behind this.
+> Created by [seed](https://github.com/justinphilpott/seed) — a tool for scaffolding agentic POC documentation.
 
 ## Core Information Categories
 
