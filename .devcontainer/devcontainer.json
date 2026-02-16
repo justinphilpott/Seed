@@ -7,7 +7,8 @@
   // Mount host Claude storage to preserve conversations across host/container contexts
   "mounts": [
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,readonly"
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,readonly",
+    "source=seed-vscode-extensions,target=/home/vscode/.vscode-server/extensions,type=volume"
   ],
 
   // Create host project dir (if needed) and symlink container path to it, so Claude Code

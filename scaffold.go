@@ -276,6 +276,9 @@ func (s *Scaffolder) scaffoldDevContainer(targetDir string, data TemplateData) e
 		return fmt.Errorf("failed to create .devcontainer directory: %w", err)
 	}
 
+	// Use a named volume to cache VS Code extensions across container rebuilds
+	extensionsVolume := strings.ToLower(strings.ReplaceAll(data.ProjectName, " ", "-")) + "-vscode-extensions"
+
 	dc := DevContainer{
 		Name:  fmt.Sprintf("%s (Dev Container)", data.ProjectName),
 		Image: "mcr.microsoft.com/devcontainers/" + data.DevContainerImage,
@@ -284,6 +287,7 @@ func (s *Scaffolder) scaffoldDevContainer(targetDir string, data TemplateData) e
 		},
 		Mounts: []string{
 			"source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,readonly",
+			fmt.Sprintf("source=%s,target=/home/vscode/.vscode-server/extensions,type=volume", extensionsVolume),
 		},
 	}
 
