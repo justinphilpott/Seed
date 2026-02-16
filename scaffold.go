@@ -288,8 +288,8 @@ func generateSetupScript() string {
 	b.WriteString("# HOST_WORKSPACE is set via containerEnv in devcontainer.json\n")
 	b.WriteString("# and resolved from ${localWorkspaceFolder} at container creation time.\n\n")
 
-	b.WriteString("HOST_KEY=$(echo \"$HOST_WORKSPACE\" | tr '/' '-' | sed 's/^-//')\n")
-	b.WriteString("CONTAINER_KEY=$(pwd | tr '/' '-' | sed 's/^-//')\n\n")
+	b.WriteString("HOST_KEY=$(echo \"$HOST_WORKSPACE\" | tr '/' '-')\n")
+	b.WriteString("CONTAINER_KEY=$(pwd | tr '/' '-')\n\n")
 
 	for _, tool := range knownAITools {
 		b.WriteString(fmt.Sprintf("# %s (auto-detected)\n", tool.Label))
