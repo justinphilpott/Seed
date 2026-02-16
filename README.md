@@ -1,29 +1,13 @@
 # Seed
 
-Spin up a new project in seconds, ready for AI-assisted development from the first commit.
-
-Seed is a tiny CLI that scaffolds everything you need to start building a POC with coding agents like Claude Code or Codex:
-
-- **Structured markdown files** — README, AGENTS.md, DECISIONS.md, TODO.md, and LEARNINGS.md give your AI agent the context it needs to make good decisions from the start, and give you a lightweight system for tracking what matters as the project evolves
-- **Dev container config** — pick your stack (Go, Node, Python, Rust, Java, .NET, C++, or Universal) and get a working `.devcontainer/` setup with the right base image, so you can develop in a consistent, reproducible environment from day one
-- **AI chat continuity** — optionally preserve your Claude Code and Codex conversation history across container rebuilds, so you don't lose context when your environment resets
-- **Agent skills** — installable markdown procedures (like `doc-health-check`) that teach your AI agent reusable workflows
-
-No boilerplate bloat. The templates are deliberately minimal — just enough structure to grow into, not documentation homework.
-
-## Quick start
+Scaffold a POC in seconds, ready for AI-assisted development from commit one.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/justinphilpott/seed/main/install.sh | sh
-```
-
-Then point it at a directory:
-
-```bash
 seed myproject
 ```
 
-An interactive wizard walks you through naming, description, and optional features. Thirty seconds later you have a project that's ready to open in your editor and start prompting.
+You get minimal, agent-friendly project docs (AGENTS.md, TODO.md, DECISIONS.md, LEARNINGS.md), optional dev container config, and AI chat continuity across container rebuilds. No bloat — just enough structure to grow into.
 
 ## What you get
 

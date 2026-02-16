@@ -49,6 +49,10 @@ Seed follows strict separation of concerns across four files:
 
 **Ultra-minimal templates.** Templates are scaffolding to build on, not documentation homework. Removed: TechStack, Author, "Last Updated" fields, format sections, verbose guidelines. Kept: clean examples, minimal placeholders, navigation links.
 
+**Working practices over structure.** AGENTS.md includes a "Working Practices" section that encodes the habits that keep docs alive: atomic commits, docs-with-code, coherence checks before committing, and pruning stale placeholders. These principles are more valuable than structural rules because docs rot from neglected habits, not missing sections.
+
+**TODO.md as live working context.** TODO.md's "Doing Now" section serves double duty: it's crash recovery (if a session dies mid-task, the next one knows what was happening) and a commit message source (completed items flow directly into the commit, then get cleared). This keeps TODO.md as a living document rather than a stale list. The file is also explicitly positioned as a stepping stone — projects should graduate to a proper issue tracker once they have momentum.
+
 **Embedded filesystem.** Templates and skills are embedded at compile time via `//go:embed`. The binary is fully self-contained — no external files needed.
 
 **Programmatic JSON.** Devcontainer JSON is generated via `encoding/json`, not text/template. JSON with conditional fields is fragile in text/template (trailing commas, escaping). Programmatic generation guarantees valid JSON.

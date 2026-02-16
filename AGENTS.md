@@ -10,6 +10,15 @@ Go CLI tool for rapid agentic POC scaffolding. Run `seed <directory>` to create 
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Development setup, architecture, template variables, extending seed
 - [LEARNINGS.md](LEARNINGS.md) - Validated discoveries across both layers (see below)
 
+## Working Practices
+
+- **Small, atomic commits**: One logical change per commit. If you can't summarise it in a sentence, break it up
+- **Commit early, commit often**: Working code with tests beats perfect code in progress. Small commits are easy to review, revert, and understand in git log
+- **TODO.md as live context**: Before starting work, write what you're doing in TODO.md's "Doing Now" section — enough detail to resume if interrupted or context is lost. When the work is complete, derive your commit message from those items, then clear the section
+- **Docs travel with code**: If a change affects how the project works, update the relevant docs in the same commit — not later
+- **Check coherence before committing**: Skim project docs and verify they still agree with each other and with the code. Fix drift immediately — it compounds fast
+- **Prune ruthlessly**: Replace placeholders with real content as soon as you can, or delete them. Stale scaffolding is worse than no scaffolding
+
 ## Project Constraints
 
 - Single external dependency (Charm's Huh library for TUI)
