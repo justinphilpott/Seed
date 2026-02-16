@@ -25,45 +25,83 @@ esac
 ASSET="seed-${OS}-${ARCH}"
 URL="https://github.com/${REPO}/releases/latest/download/${ASSET}"
 
-echo "Installing seed (${OS}/${ARCH})..."
+echo ""
+echo "    🌱 seed · installer"
+echo "    ─────────────────────────────"
+echo "    OS: ${OS}  Arch: ${ARCH}"
+echo "    Source: github.com/${REPO}"
+echo "    Target: ${INSTALL_DIR}/${BINARY_NAME}"
+echo ""
+
+# Spinner helper — runs in background, caller kills via $SPINNER_PID
+start_spinner() {
+    printf "    %s " "$1"
+    while true; do
+        for c in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
+            printf '\b%s' "$c"
+            sleep 0.1
+        done
+    done &
+    SPINNER_PID=$!
+}
+
+stop_spinner() {
+    kill "$SPINNER_PID" 2>/dev/null
+    wait "$SPINNER_PID" 2>/dev/null
+    printf '\b✓\n'
+}
 
 # Create install directory
+start_spinner "Creating ${INSTALL_DIR}..."
 mkdir -p "$INSTALL_DIR"
+stop_spinner
 
 # Download binary
 TMPFILE="$(mktemp)"
-trap 'rm -f "$TMPFILE"' EXIT
+trap 'rm -f "$TMPFILE"; kill "$SPINNER_PID" 2>/dev/null' EXIT
 
+start_spinner "Downloading ${ASSET} from latest release..."
 if command -v curl >/dev/null 2>&1; then
     curl -fsSL -o "$TMPFILE" "$URL"
 elif command -v wget >/dev/null 2>&1; then
     wget -qO "$TMPFILE" "$URL"
 else
+    stop_spinner
     echo "Error: curl or wget is required" >&2
     exit 1
 fi
+stop_spinner
 
 # Install
+start_spinner "Installing to ${INSTALL_DIR}/${BINARY_NAME}..."
 mv "$TMPFILE" "${INSTALL_DIR}/${BINARY_NAME}"
 chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
+stop_spinner
 
 # Verify
+start_spinner "Verifying installation..."
 if "${INSTALL_DIR}/${BINARY_NAME}" --version >/dev/null 2>&1; then
-    echo "seed installed to ${INSTALL_DIR}/${BINARY_NAME}"
     VERSION="$("${INSTALL_DIR}/${BINARY_NAME}" --version 2>&1 || true)"
+    stop_spinner
     if [ -n "$VERSION" ]; then
-        echo "$VERSION"
+        echo ""
+        echo "    ${VERSION}"
     fi
 else
-    echo "seed installed to ${INSTALL_DIR}/${BINARY_NAME}"
+    stop_spinner
 fi
+
+echo ""
 
 # PATH hint
 case ":$PATH:" in
-    *":${INSTALL_DIR}:"*) ;;
+    *":${INSTALL_DIR}:"*)
+        echo "    Ready to go! Run 'seed' to get started."
+        ;;
     *)
-        echo ""
-        echo "Add ${INSTALL_DIR} to your PATH:"
-        echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
+        echo "    Add ${INSTALL_DIR} to your PATH to get started:"
+        echo "      export PATH=\"${INSTALL_DIR}:\$PATH\""
         ;;
 esac
+
+echo ""
