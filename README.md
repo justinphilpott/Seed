@@ -78,7 +78,9 @@ Skills are markdown files that define reusable procedures your AI agent can foll
 seed skills ./myproject
 ```
 
-Currently ships with `doc-health-check` — an audit that reviews your project's documentation coverage and flags gaps.
+Currently ships with:
+- `doc-health-check` — an audit that reviews your project's documentation coverage and flags gaps
+- `seed-feedback` — an optional channel for agents to submit suggestions back to seed when they notice gaps in the scaffolding
 
 ## Contributing
 

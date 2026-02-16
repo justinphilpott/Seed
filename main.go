@@ -239,6 +239,7 @@ func runSkills() error {
 	fmt.Println()
 	fmt.Println(dimStyle.Render("Installed skills:"))
 	fmt.Println(dimStyle.Render("  doc-health-check.md  — Audit project docs for informational coverage"))
+	fmt.Println(dimStyle.Render("  seed-feedback.md     — Submit scaffolding suggestions back to seed"))
 	fmt.Println()
 	fmt.Println(dimStyle.Render("Point your agent at skills/ to use them."))
 
