@@ -22,20 +22,21 @@
   - AI chat continuity for Claude Code and/or Codex (bind mounts + dynamic symlink setup)
   - Generated programmatically via encoding/json (not text/template) for reliable JSON output
 
+- **Skills system** — `seed skills <dir>` installs agent skill files (e.g., doc-health-check)
+  - Skill files embedded via `//go:embed skills/*.md`
+  - `skills.go` handles installation, following scaffold.go patterns
+
 ### 📋 Next Up
-- Future: upgrade/brownfield support (via skill)
 - Future: `seed init` for existing projects
 
 ## Template Files (templates/)
 
 **Core templates** (always created):
-1. `README.md.tmpl` (16 lines) - Human entry point
-2. `AGENTS.md.tmpl` (18 lines) - Agent context
-3. `DECISIONS.md.tmpl` (15 lines) - Architectural decisions
-4. `TODO.md.tmpl` (15 lines) - Active work
-
-**Optional template**:
-5. `LEARNINGS.md.tmpl` (17 lines) - Created if user opts in
+1. `README.md.tmpl` - Human entry point
+2. `AGENTS.md.tmpl` - Agent context
+3. `DECISIONS.md.tmpl` - Architectural decisions
+4. `TODO.md.tmpl` - Active work
+5. `LEARNINGS.md.tmpl` - Validated discoveries
 
 ## Template Variables
 
@@ -44,12 +45,9 @@
 - `Description` - Short description (1-2 sentences)
 
 **Optional**:
-- `IncludeLearnings` - Boolean, whether to create LEARNINGS.md (default: false)
 - `IncludeDevContainer` - Boolean, whether to scaffold .devcontainer/ (default: false)
 - `DevContainerImage` - MCR image tag, e.g. "go:2-1.25-trixie" (only if devcontainer opted in)
 - `AIChatContinuity` - Boolean, whether to enable AI chat continuity (only if devcontainer opted in)
-
-_(Date and Year fields were removed — templates don't use them.)_
 
 ## Key Design Decisions
 
@@ -74,12 +72,15 @@ seed/                          ← seed tool source
 │   ├── DECISIONS.md.tmpl
 │   ├── LEARNINGS.md.tmpl
 │   └── TODO.md.tmpl
+├── skills/
+│   └── doc-health-check.md    ← agent skill: doc health audit
 ├── .devcontainer/
 │   └── devcontainer.json      ← seed's own devcontainer (for developing seed)
 ├── .github/workflows/release.yml
 ├── main.go
 ├── wizard.go
 ├── scaffold.go
+├── skills.go                  ← skill embedding and installation
 ├── scaffold_test.go
 ├── wizard_test.go
 ├── go.mod
@@ -95,7 +96,7 @@ Scaffolded output (example):   ← what seed creates for users
 ├── AGENTS.md
 ├── DECISIONS.md
 ├── TODO.md
-├── LEARNINGS.md               (optional)
+├── LEARNINGS.md
 └── .devcontainer/             (optional)
     ├── devcontainer.json      ← generated via encoding/json
     └── setup.sh               ← AI chat continuity symlinks (if AI tools selected)
@@ -104,7 +105,7 @@ Scaffolded output (example):   ← what seed creates for users
 ## TUI Wizard
 
 **Implementation**: Charm's Huh library (form/wizard) with 3 form groups:
-1. **Core info**: ProjectName (Input), Description (Text), IncludeLearnings (Confirm)
+1. **Core info**: ProjectName (Input), Description (Text)
 2. **Options**: InitGit (Confirm), IncludeDevContainer (Confirm)
 3. **Dev container details** (conditional, hidden unless opted in): DevContainerImage (Select), AIChatContinuity (Confirm)
 
@@ -116,7 +117,8 @@ Scaffolded output (example):   ← what seed creates for users
 ## Commands
 
 - `go mod tidy` - Update dependencies
-- `go run .` - Run seed CLI
+- `go run .` - Run seed CLI (scaffold new project)
+- `go run . skills <dir>` - Install agent skills into existing project
 - `make build` - Build binary with version injection
 - `make test` - Run tests
 - `go test -count=1 ./...` - Run tests (without make)

@@ -61,6 +61,11 @@ func main() {
 // Returns:
 // - error: If any step fails
 func run() error {
+	// Handle subcommands before normal arg parsing
+	if len(os.Args) >= 2 && os.Args[1] == "skills" {
+		return runSkills()
+	}
+
 	// Step 1: Parse command-line arguments
 	targetDir, err := parseArgs()
 	if err != nil {
@@ -199,6 +204,45 @@ func initGitRepo(targetDir, projectName string) error {
 	return nil
 }
 
+// runSkills handles the `seed skills <directory>` subcommand.
+// Installs embedded skill files into the target project's skills/ directory.
+func runSkills() error {
+	args := os.Args[2:] // Skip "seed" and "skills"
+
+	if len(args) == 0 {
+		return fmt.Errorf("missing target directory\n\nUsage: seed skills <directory>")
+	}
+	if args[0] == "--help" || args[0] == "-h" {
+		fmt.Println("Install agent skill files into an existing project.")
+		fmt.Println()
+		fmt.Println("Usage: seed skills <directory>")
+		fmt.Println()
+		fmt.Println("Copies skill files (e.g., doc-health-check.md) into <directory>/skills/.")
+		fmt.Println("Skills are agent instructions — markdown files that define reusable procedures.")
+		os.Exit(0)
+	}
+	if len(args) > 1 {
+		return fmt.Errorf("too many arguments\n\nUsage: seed skills <directory>")
+	}
+
+	targetDir := args[0]
+	if err := InstallSkills(targetDir); err != nil {
+		return err
+	}
+
+	fmt.Println()
+	fmt.Printf("%s Skills installed to: %s\n",
+		successStyle.Render("✓"),
+		filepath.Join(targetDir, "skills"))
+	fmt.Println()
+	fmt.Println(dimStyle.Render("Installed skills:"))
+	fmt.Println(dimStyle.Render("  doc-health-check.md  — Audit project docs for informational coverage"))
+	fmt.Println()
+	fmt.Println(dimStyle.Render("Point your agent at skills/ to use them."))
+
+	return nil
+}
+
 // parseArgs parses command-line arguments and returns the target directory.
 //
 // Expected usage:
@@ -249,16 +293,18 @@ func showUsage() {
 	fmt.Printf(`seed v%s - Project Scaffolder
 
 USAGE:
-  seed <directory>
+  seed <directory>              Scaffold a new project
+  seed skills <directory>       Install agent skills into a project
 
 DESCRIPTION:
   Creates a new project with minimal, agent-friendly documentation.
   Runs an interactive wizard to collect project details.
 
 EXAMPLES:
-  seed myproject       Create ./myproject/
-  seed ~/dev/myapp     Create ~/dev/myapp/
-  seed .               Use current directory (if empty)
+  seed myproject                Create ./myproject/
+  seed ~/dev/myapp              Create ~/dev/myapp/
+  seed .                        Use current directory (if empty)
+  seed skills ./myproject       Install skills into existing project
 
 FLAGS:
   -h, --help      Show this help message
@@ -269,7 +315,7 @@ GENERATED FILES:
   AGENTS.md                        Agent context and constraints
   DECISIONS.md                     Key architectural decisions
   TODO.md                          Active work and next steps
-  LEARNINGS.md                     Validated discoveries (optional)
+  LEARNINGS.md                     Validated discoveries
   .devcontainer/devcontainer.json  Dev container config (optional)
   .devcontainer/setup.sh           AI chat continuity (optional)
 

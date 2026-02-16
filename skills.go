@@ -1,0 +1,72 @@
+// Package main - skills.go
+//
+// PURPOSE:
+// This file handles installing skill files into target projects.
+// Skills are markdown-based agent instructions (e.g., doc health check)
+// that are embedded in the binary and copied to the target project.
+//
+// DESIGN PATTERNS:
+// - Embedded filesystem (embed.FS) for zero-dependency distribution
+// - Same pattern as scaffold.go: embed at compile time, copy to target
+// - Separation of concerns: this file doesn't know about TUI or CLI args
+//
+// USAGE:
+// err := InstallSkills("/path/to/project")
+
+package main
+
+import (
+	"embed"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+)
+
+// skillsFS embeds all skill files at compile time.
+//
+//go:embed skills/*.md
+var skillsFS embed.FS
+
+// InstallSkills copies all embedded skill files into targetDir/skills/.
+// Creates the skills/ directory if it doesn't exist.
+func InstallSkills(targetDir string) error {
+	// Verify target directory exists
+	info, err := os.Stat(targetDir)
+	if err != nil {
+		return fmt.Errorf("target directory %s does not exist", targetDir)
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("%s is not a directory", targetDir)
+	}
+
+	// Create skills/ subdirectory
+	skillsDir := filepath.Join(targetDir, "skills")
+	if err := os.MkdirAll(skillsDir, 0755); err != nil {
+		return fmt.Errorf("failed to create skills directory: %w", err)
+	}
+
+	// Walk embedded skills and copy each one
+	entries, err := fs.ReadDir(skillsFS, "skills")
+	if err != nil {
+		return fmt.Errorf("failed to read embedded skills: %w", err)
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		content, err := skillsFS.ReadFile(filepath.Join("skills", entry.Name()))
+		if err != nil {
+			return fmt.Errorf("failed to read skill %s: %w", entry.Name(), err)
+		}
+
+		outputPath := filepath.Join(skillsDir, entry.Name())
+		if err := os.WriteFile(outputPath, content, 0644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", outputPath, err)
+		}
+	}
+
+	return nil
+}

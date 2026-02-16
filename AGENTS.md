@@ -26,7 +26,9 @@ Go CLI tool for rapid agentic POC scaffolding. Run `seed <directory>` to create 
 - **scaffold.go** - Template rendering (embed.FS + text/template), devcontainer generation
 - **scaffold_test.go** - Scaffold/template tests
 - **wizard_test.go** - Wizard validation and data transformation tests
+- **skills.go** - Skill file embedding and installation logic
 - **templates/*.tmpl** - Embedded project templates (README, AGENTS, DECISIONS, TODO, LEARNINGS)
+- **skills/*.md** - Embedded agent skill definitions (doc-health-check)
 
 ## Commands
 
