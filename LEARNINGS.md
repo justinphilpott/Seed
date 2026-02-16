@@ -40,6 +40,20 @@ Capture discoveries as we build. Focus on what we validated, not just opinions.
 
 ---
 
+### Templates Are Seeds, Not Blueprints
+
+**Topic**: Documentation Architecture (both layers)
+
+**What**: Seed's own doc set (CLAUDE.md, AGENTS.md, CONTEXT.md, BUILD.md, LEARNINGS.md) differs from the starter set it scaffolds for users (AGENTS.md, README.md, DECISIONS.md, TODO.md, LEARNINGS.md). This looks like a contradiction but is actually validation. The templates scaffold *categories of information* — agent context, decisions, active work, learnings — not a permanent file structure. As a project matures, categories naturally merge, split, or migrate to serve actual needs.
+
+**How validated**: Seed itself demonstrates the pattern. CONTEXT.md absorbed what DECISIONS.md would cover. BUILD.md emerged for Go-specific learning content that no starter template anticipated. CLAUDE.md appeared for tool-specific agent instructions. No file from the starter set was "missing" — every information category was covered, just in different containers.
+
+**Resolution for agents/humans**: When a project's docs diverge from the starter set, the test isn't "do you still have DECISIONS.md?" but "can an agent find the decisions?" If the information is discoverable through AGENTS.md's links and cross-references, the doc set is healthy regardless of which files it uses.
+
+**Impact**: The brownfield/upgrade skill should audit *informational coverage* (are constraints, decisions, architecture, active work, and learnings all discoverable?), not *file presence*. This also means seed's own divergence from its templates is a feature, not a bug — and a useful test case for the brownfield tool.
+
+---
+
 ### Cross-Agent Compatibility via AGENTS.md
 
 **Topic**: Project Setup
