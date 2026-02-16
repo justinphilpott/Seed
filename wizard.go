@@ -74,7 +74,6 @@ func RunWizard() (WizardData, error) {
 				CharLimit(500).
 				Value(&data.Description).
 				Validate(validateDescription),
-
 		),
 
 		// Group 2: Project setup options
@@ -92,6 +91,8 @@ func RunWizard() (WizardData, error) {
 
 		// Group 3: Dev container details (only shown if opted in)
 		huh.NewGroup(
+			// Image tags reference MCR defaults at time of release.
+			// Check https://mcr.microsoft.com for current versions.
 			huh.NewSelect[string]().
 				Title("Which tech stack?").
 				Description("Base image from Microsoft Container Registry").

@@ -360,7 +360,6 @@ func TestTargetPathIsFileFails(t *testing.T) {
 	}
 }
 
-
 func TestSpecialCharsInProjectName(t *testing.T) {
 	names := []string{
 		"my project (v2)",

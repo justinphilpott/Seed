@@ -21,6 +21,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // skillsFS embeds all skill files at compile time.
@@ -52,8 +53,17 @@ func InstallSkills(targetDir string) error {
 		return fmt.Errorf("failed to read embedded skills: %w", err)
 	}
 
+	var skipped []string
 	for _, entry := range entries {
 		if entry.IsDir() {
+			continue
+		}
+
+		outputPath := filepath.Join(skillsDir, entry.Name())
+
+		// Skip files that already exist to avoid clobbering user modifications
+		if _, err := os.Stat(outputPath); err == nil {
+			skipped = append(skipped, entry.Name())
 			continue
 		}
 
@@ -62,10 +72,15 @@ func InstallSkills(targetDir string) error {
 			return fmt.Errorf("failed to read skill %s: %w", entry.Name(), err)
 		}
 
-		outputPath := filepath.Join(skillsDir, entry.Name())
 		if err := os.WriteFile(outputPath, content, 0644); err != nil {
 			return fmt.Errorf("failed to write %s: %w", outputPath, err)
 		}
+	}
+
+	if len(skipped) > 0 {
+		fmt.Printf("%s Skipped (already exist): %s\n",
+			dimStyle.Render("!"),
+			strings.Join(skipped, ", "))
 	}
 
 	return nil
