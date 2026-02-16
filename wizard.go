@@ -33,6 +33,7 @@ import (
 type WizardData struct {
 	ProjectName         string
 	Description         string
+	License             string // "none", "MIT", or "Apache-2.0"
 	InitGit             bool   // Whether to run git init + initial commit
 	IncludeDevContainer bool   // Whether to scaffold .devcontainer/
 	DevContainerImage   string // MCR image tag, e.g. "go:2-1.25-trixie"
@@ -79,6 +80,16 @@ func RunWizard(defaultName string) (WizardData, error) {
 
 		// Group 2: Project setup options
 		huh.NewGroup(
+			huh.NewSelect[string]().
+				Title("License").
+				Description("Open-source license for your project").
+				Options(
+					huh.NewOption("None", "none"),
+					huh.NewOption("MIT", "MIT"),
+					huh.NewOption("Apache-2.0", "Apache-2.0"),
+				).
+				Value(&data.License),
+
 			huh.NewConfirm().
 				Title("Initialize git repository?").
 				Description("Runs git init and creates an initial commit").
@@ -198,6 +209,7 @@ func (w WizardData) ToTemplateData() TemplateData {
 	return TemplateData{
 		ProjectName:         w.ProjectName,
 		Description:         w.Description,
+		License:             w.License,
 		IncludeDevContainer: w.IncludeDevContainer,
 		DevContainerImage:   w.DevContainerImage,
 		AIChatContinuity:    w.AIChatContinuity,

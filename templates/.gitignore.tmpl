@@ -1,0 +1,75 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+{{- if eq .DevContainerImage "go:2-1.25-trixie"}}
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+{{- else if eq .DevContainerImage "typescript-node:20-bookworm"}}
+
+# Node
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+.npm
+{{- else if eq .DevContainerImage "python:3-3.12"}}
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+{{- else if eq .DevContainerImage "rust:1-bookworm"}}
+
+# Rust
+target/
+{{- else if eq .DevContainerImage "java"}}
+
+# Java
+*.class
+*.jar
+*.war
+build/
+.gradle/
+target/
+{{- else if eq .DevContainerImage "dotnet"}}
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+{{- else if eq .DevContainerImage "cpp"}}
+
+# C++
+*.o
+*.obj
+*.so
+*.dylib
+*.exe
+build/
+{{- end}}

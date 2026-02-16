@@ -34,7 +34,7 @@ func TestCoreFilesAlwaysCreated(t *testing.T) {
 		Description: "A test project",
 	})
 
-	for _, name := range []string{"README.md", "AGENTS.md", "DECISIONS.md", "TODO.md", "LEARNINGS.md"} {
+	for _, name := range []string{"README.md", "AGENTS.md", "DECISIONS.md", "TODO.md", "LEARNINGS.md", ".gitignore", ".editorconfig"} {
 		path := filepath.Join(target, name)
 		if _, err := os.Stat(path); err != nil {
 			t.Errorf("expected %s to exist: %v", name, err)
@@ -384,6 +384,164 @@ func TestSpecialCharsInProjectName(t *testing.T) {
 				t.Errorf("README.md should contain project name %q", name)
 			}
 		})
+	}
+}
+
+func TestGitignoreContent(t *testing.T) {
+	t.Run("common patterns always present", func(t *testing.T) {
+		target := mustScaffold(t, TemplateData{
+			ProjectName: "test-gitignore",
+			Description: "A test project",
+		})
+		raw, err := os.ReadFile(filepath.Join(target, ".gitignore"))
+		if err != nil {
+			t.Fatalf(".gitignore should exist: %v", err)
+		}
+		content := string(raw)
+		for _, pattern := range []string{".DS_Store", ".env", ".idea/"} {
+			if !strings.Contains(content, pattern) {
+				t.Errorf(".gitignore should contain %q", pattern)
+			}
+		}
+	})
+
+	t.Run("Go-specific patterns with Go image", func(t *testing.T) {
+		target := mustScaffold(t, TemplateData{
+			ProjectName:         "test-gitignore-go",
+			Description:         "A test project",
+			IncludeDevContainer: true,
+			DevContainerImage:   "go:2-1.25-trixie",
+		})
+		raw, err := os.ReadFile(filepath.Join(target, ".gitignore"))
+		if err != nil {
+			t.Fatalf(".gitignore should exist: %v", err)
+		}
+		content := string(raw)
+		if !strings.Contains(content, "vendor/") {
+			t.Error(".gitignore should contain Go-specific pattern 'vendor/'")
+		}
+	})
+
+	t.Run("Node-specific patterns with Node image", func(t *testing.T) {
+		target := mustScaffold(t, TemplateData{
+			ProjectName:         "test-gitignore-node",
+			Description:         "A test project",
+			IncludeDevContainer: true,
+			DevContainerImage:   "typescript-node:20-bookworm",
+		})
+		raw, err := os.ReadFile(filepath.Join(target, ".gitignore"))
+		if err != nil {
+			t.Fatalf(".gitignore should exist: %v", err)
+		}
+		content := string(raw)
+		if !strings.Contains(content, "node_modules/") {
+			t.Error(".gitignore should contain Node-specific pattern 'node_modules/'")
+		}
+	})
+}
+
+func TestEditorconfigContent(t *testing.T) {
+	target := mustScaffold(t, TemplateData{
+		ProjectName: "test-editorconfig",
+		Description: "A test project",
+	})
+	raw, err := os.ReadFile(filepath.Join(target, ".editorconfig"))
+	if err != nil {
+		t.Fatalf(".editorconfig should exist: %v", err)
+	}
+	content := string(raw)
+	for _, expected := range []string{"root = true", "charset = utf-8", "end_of_line = lf", "insert_final_newline = true"} {
+		if !strings.Contains(content, expected) {
+			t.Errorf(".editorconfig should contain %q", expected)
+		}
+	}
+}
+
+func TestLicenseMIT(t *testing.T) {
+	target := mustScaffold(t, TemplateData{
+		ProjectName: "test-mit",
+		Description: "A test project",
+		License:     "MIT",
+		Year:        2025,
+	})
+	raw, err := os.ReadFile(filepath.Join(target, "LICENSE"))
+	if err != nil {
+		t.Fatalf("LICENSE should exist: %v", err)
+	}
+	content := string(raw)
+	if !strings.Contains(content, "MIT License") {
+		t.Error("LICENSE should contain 'MIT License'")
+	}
+	if !strings.Contains(content, "2025") {
+		t.Error("LICENSE should contain the year")
+	}
+	if !strings.Contains(content, "test-mit") {
+		t.Error("LICENSE should contain the project name")
+	}
+}
+
+func TestLicenseApache(t *testing.T) {
+	target := mustScaffold(t, TemplateData{
+		ProjectName: "test-apache",
+		Description: "A test project",
+		License:     "Apache-2.0",
+		Year:        2025,
+	})
+	raw, err := os.ReadFile(filepath.Join(target, "LICENSE"))
+	if err != nil {
+		t.Fatalf("LICENSE should exist: %v", err)
+	}
+	content := string(raw)
+	if !strings.Contains(content, "Apache License") {
+		t.Error("LICENSE should contain 'Apache License'")
+	}
+	if !strings.Contains(content, "2025") {
+		t.Error("LICENSE should contain the year")
+	}
+}
+
+func TestLicenseNone(t *testing.T) {
+	target := mustScaffold(t, TemplateData{
+		ProjectName: "test-no-license",
+		Description: "A test project",
+		License:     "none",
+	})
+	if _, err := os.Stat(filepath.Join(target, "LICENSE")); !os.IsNotExist(err) {
+		t.Error("LICENSE should not exist when license is 'none'")
+	}
+}
+
+func TestLicenseDefaultEmpty(t *testing.T) {
+	target := mustScaffold(t, TemplateData{
+		ProjectName: "test-no-license-default",
+		Description: "A test project",
+	})
+	if _, err := os.Stat(filepath.Join(target, "LICENSE")); !os.IsNotExist(err) {
+		t.Error("LICENSE should not exist when license is empty")
+	}
+}
+
+func TestDevcontainerHasGitHubCLIFeature(t *testing.T) {
+	target := mustScaffold(t, TemplateData{
+		ProjectName:         "test-dc-ghcli",
+		Description:         "A test project",
+		IncludeDevContainer: true,
+		DevContainerImage:   "go:2-1.25-trixie",
+	})
+
+	dcPath := filepath.Join(target, ".devcontainer", "devcontainer.json")
+	raw, err := os.ReadFile(dcPath)
+	if err != nil {
+		t.Fatalf("devcontainer.json should exist: %v", err)
+	}
+
+	var dc DevContainer
+	if err := json.Unmarshal(raw, &dc); err != nil {
+		t.Fatalf("devcontainer.json is not valid JSON: %v", err)
+	}
+
+	if _, ok := dc.Features["ghcr.io/devcontainers/features/github-cli:1"]; !ok {
+		t.Error("devcontainer should include github-cli feature")
 	}
 }
 

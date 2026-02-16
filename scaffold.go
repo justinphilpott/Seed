@@ -28,6 +28,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 )
 
 // templatesFS embeds all .tmpl files at compile time.
@@ -47,6 +48,8 @@ type TemplateData struct {
 	IncludeDevContainer bool   // Whether to scaffold .devcontainer/
 	DevContainerImage   string // MCR image tag, e.g. "go:2-1.25-trixie"
 	AIChatContinuity    bool   // Whether to enable AI chat continuity
+	License             string // "none", "MIT", or "Apache-2.0"
+	Year                int    // Current year for LICENSE copyright
 }
 
 // knownAITools lists AI coding tools and their state directories.
@@ -63,11 +66,12 @@ var knownAITools = []struct {
 // Marshaled to JSON programmatically (not via text/template) to guarantee
 // valid JSON output and handle conditional fields cleanly.
 type DevContainer struct {
-	Name              string            `json:"name"`
-	Image             string            `json:"image"`
-	Mounts            []string          `json:"mounts,omitempty"`
-	ContainerEnv      map[string]string `json:"containerEnv,omitempty"`
-	PostCreateCommand string            `json:"postCreateCommand,omitempty"`
+	Name              string                 `json:"name"`
+	Image             string                 `json:"image"`
+	Features          map[string]interface{} `json:"features,omitempty"`
+	Mounts            []string               `json:"mounts,omitempty"`
+	ContainerEnv      map[string]string      `json:"containerEnv,omitempty"`
+	PostCreateCommand string                 `json:"postCreateCommand,omitempty"`
 }
 
 // Scaffolder handles template rendering and file generation.
@@ -115,6 +119,11 @@ func (s *Scaffolder) Scaffold(targetDir string, data TemplateData, allowNonEmpty
 		return err
 	}
 
+	// Auto-populate year for license templates
+	if data.Year == 0 {
+		data.Year = time.Now().Year()
+	}
+
 	// Step 2: Define which templates to render
 	// Core templates are always created
 	coreTemplates := []string{
@@ -123,6 +132,8 @@ func (s *Scaffolder) Scaffold(targetDir string, data TemplateData, allowNonEmpty
 		"DECISIONS.md.tmpl",
 		"TODO.md.tmpl",
 		"LEARNINGS.md.tmpl",
+		".gitignore.tmpl",
+		".editorconfig.tmpl",
 	}
 
 	// Render all core templates
@@ -132,7 +143,12 @@ func (s *Scaffolder) Scaffold(targetDir string, data TemplateData, allowNonEmpty
 		}
 	}
 
-	// Step 3: Conditionally scaffold .devcontainer/
+	// Step 3: Conditionally scaffold LICENSE
+	if err := s.scaffoldLicense(targetDir, data); err != nil {
+		return err
+	}
+
+	// Step 4: Conditionally scaffold .devcontainer/
 	if data.IncludeDevContainer {
 		if err := s.scaffoldDevContainer(targetDir, data); err != nil {
 			return err
@@ -225,6 +241,32 @@ func (s *Scaffolder) renderTemplate(targetDir, templateName string, data Templat
 	return nil
 }
 
+// scaffoldLicense renders the chosen license template as LICENSE in the target directory.
+// Does nothing if License is "none" or empty.
+func (s *Scaffolder) scaffoldLicense(targetDir string, data TemplateData) error {
+	var tmplName string
+	switch data.License {
+	case "MIT":
+		tmplName = "LICENSE-MIT.tmpl"
+	case "Apache-2.0":
+		tmplName = "LICENSE-Apache.tmpl"
+	default:
+		return nil // "none" or empty — skip
+	}
+
+	outputPath := filepath.Join(targetDir, "LICENSE")
+	file, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to create LICENSE: %w", err)
+	}
+	defer file.Close()
+
+	if err := s.templates.ExecuteTemplate(file, tmplName, data); err != nil {
+		return fmt.Errorf("failed to render LICENSE: %w", err)
+	}
+	return nil
+}
+
 // scaffoldDevContainer generates .devcontainer/devcontainer.json and optionally
 // .devcontainer/setup.sh for AI chat continuity. Uses encoding/json to guarantee
 // valid JSON output rather than text/template (which is fragile for JSON).
@@ -237,6 +279,9 @@ func (s *Scaffolder) scaffoldDevContainer(targetDir string, data TemplateData) e
 	dc := DevContainer{
 		Name:  fmt.Sprintf("%s (Dev Container)", data.ProjectName),
 		Image: "mcr.microsoft.com/devcontainers/" + data.DevContainerImage,
+		Features: map[string]interface{}{
+			"ghcr.io/devcontainers/features/github-cli:1": map[string]interface{}{},
+		},
 	}
 
 	// If chat continuity enabled, mount all known AI tool dirs and generate setup script

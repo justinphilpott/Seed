@@ -71,7 +71,7 @@ The wizard collects a project name, description, and optional settings (git init
 ### Dev Container Support
 
 Seed can generate a `.devcontainer/` configuration with:
-- Base images for Go, Node/TypeScript, Python, Rust, Java, .NET, C++, or Universal
+- Base images from [Microsoft Container Registry](https://mcr.microsoft.com) (MCR) for Go, Node/TypeScript, Python, Rust, Java, .NET, C++, or Universal
 - Optional AI chat continuity that auto-detects Claude Code and Codex, preserving conversations across host and container
 
 ### Skills

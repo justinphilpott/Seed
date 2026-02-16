@@ -309,6 +309,9 @@ GENERATED FILES:
   DECISIONS.md                     Key architectural decisions
   TODO.md                          Active work and next steps
   LEARNINGS.md                     Validated discoveries
+  .gitignore                       Git ignore rules (language-aware)
+  .editorconfig                    Editor formatting defaults
+  LICENSE                          Open-source license (optional)
   .devcontainer/devcontainer.json  Dev container config (optional)
   .devcontainer/setup.sh           AI chat continuity (optional)
 
