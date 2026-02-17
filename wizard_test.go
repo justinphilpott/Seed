@@ -72,13 +72,15 @@ func TestValidateDescription(t *testing.T) {
 
 func TestToTemplateData(t *testing.T) {
 	wd := WizardData{
-		ProjectName:         "test-project",
-		Description:         "A test description",
-		License:             "MIT",
-		InitGit:             true,
-		IncludeDevContainer: true,
-		DevContainerImage:   "go:2-1.25-trixie",
-		AIChatContinuity:    true,
+		ProjectName:            "test-project",
+		Description:            "A test description",
+		License:                "MIT",
+		InitGit:                true,
+		IncludeDevContainer:    true,
+		DevContainerImage:      "go:2-1.25-trixie",
+		AIChatContinuity:       true,
+		InstallAgentExtensions: true,
+		AgentExtensions:        []string{"anthropics.claude-code", "openai.chatgpt"},
 	}
 
 	td := wd.ToTemplateData()
@@ -100,5 +102,13 @@ func TestToTemplateData(t *testing.T) {
 	}
 	if td.AIChatContinuity != wd.AIChatContinuity {
 		t.Errorf("AIChatContinuity: got %v, want %v", td.AIChatContinuity, wd.AIChatContinuity)
+	}
+	if len(td.VSCodeExtensions) != len(wd.AgentExtensions) {
+		t.Errorf("VSCodeExtensions length: got %d, want %d", len(td.VSCodeExtensions), len(wd.AgentExtensions))
+	}
+	for i, ext := range td.VSCodeExtensions {
+		if ext != wd.AgentExtensions[i] {
+			t.Errorf("VSCodeExtensions[%d]: got %q, want %q", i, ext, wd.AgentExtensions[i])
+		}
 	}
 }

@@ -40,16 +40,17 @@ var templatesFS embed.FS
 // TemplateData represents all variables available in templates.
 // This struct is passed to text/template when rendering.
 //
-// Fields match the template variables documented in CONTEXT.md:
+// Fields match the template variables documented in CONTRIBUTING.md:
 // - Required (from wizard): ProjectName, Description
 type TemplateData struct {
 	ProjectName         string // User's project name
 	Description         string // User's project description (1-2 sentences)
 	IncludeDevContainer bool   // Whether to scaffold .devcontainer/
 	DevContainerImage   string // MCR image tag, e.g. "go:2-1.25-trixie"
-	AIChatContinuity    bool   // Whether to enable AI chat continuity
-	License             string // "none", "MIT", or "Apache-2.0"
-	Year                int    // Current year for LICENSE copyright
+	AIChatContinuity    bool     // Whether to enable AI chat continuity
+	VSCodeExtensions    []string // VS Code extension IDs to install in dev container
+	License             string   // "none", "MIT", or "Apache-2.0"
+	Year                int      // Current year for LICENSE copyright
 }
 
 // knownAITools lists AI coding tools and their state directories.
@@ -70,13 +71,24 @@ type DevContainerBuild struct {
 	Dockerfile string `json:"dockerfile"`
 }
 
+// DevContainerVSCode holds VS Code-specific customizations.
+type DevContainerVSCode struct {
+	Extensions []string `json:"extensions,omitempty"`
+}
+
+// DevContainerCustomizations holds IDE customizations for the dev container.
+type DevContainerCustomizations struct {
+	VSCode DevContainerVSCode `json:"vscode,omitempty"`
+}
+
 type DevContainer struct {
-	Name              string                 `json:"name"`
-	Build             DevContainerBuild      `json:"build"`
-	Features          map[string]interface{} `json:"features,omitempty"`
-	Mounts            []string               `json:"mounts,omitempty"`
-	ContainerEnv      map[string]string      `json:"containerEnv,omitempty"`
-	PostCreateCommand string                 `json:"postCreateCommand,omitempty"`
+	Name              string                      `json:"name"`
+	Build             DevContainerBuild           `json:"build"`
+	Features          map[string]interface{}      `json:"features,omitempty"`
+	Customizations    *DevContainerCustomizations `json:"customizations,omitempty"`
+	Mounts            []string                    `json:"mounts,omitempty"`
+	ContainerEnv      map[string]string           `json:"containerEnv,omitempty"`
+	PostCreateCommand string                      `json:"postCreateCommand,omitempty"`
 }
 
 // Scaffolder handles template rendering and file generation.
@@ -304,6 +316,15 @@ func (s *Scaffolder) scaffoldDevContainer(targetDir string, data TemplateData) e
 			fmt.Sprintf("source=%s,target=/home/vscode/.vscode-extensions-cache,type=volume", extensionsVolume),
 		},
 		PostCreateCommand: extensionsSymlink,
+	}
+
+	// If user selected agent extensions, add them to customizations
+	if len(data.VSCodeExtensions) > 0 {
+		dc.Customizations = &DevContainerCustomizations{
+			VSCode: DevContainerVSCode{
+				Extensions: data.VSCodeExtensions,
+			},
+		}
 	}
 
 	// If chat continuity enabled, mount all known AI tool dirs and generate setup script

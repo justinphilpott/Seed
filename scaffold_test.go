@@ -573,6 +573,67 @@ func TestDevcontainerHasGitHubCLIFeature(t *testing.T) {
 	}
 }
 
+func TestDevContainerVSCodeExtensions(t *testing.T) {
+	t.Run("extensions included when selected", func(t *testing.T) {
+		target := mustScaffold(t, TemplateData{
+			ProjectName:         "test-dc-ext",
+			Description:         "A test project",
+			IncludeDevContainer: true,
+			DevContainerImage:   "go:2-1.25-trixie",
+			VSCodeExtensions:    []string{"anthropics.claude-code", "openai.chatgpt"},
+		})
+
+		dcPath := filepath.Join(target, ".devcontainer", "devcontainer.json")
+		raw, err := os.ReadFile(dcPath)
+		if err != nil {
+			t.Fatalf("devcontainer.json should exist: %v", err)
+		}
+
+		var dc DevContainer
+		if err := json.Unmarshal(raw, &dc); err != nil {
+			t.Fatalf("devcontainer.json is not valid JSON: %v", err)
+		}
+
+		if dc.Customizations == nil {
+			t.Fatal("customizations should be present when extensions are selected")
+		}
+		exts := dc.Customizations.VSCode.Extensions
+		if len(exts) != 2 {
+			t.Fatalf("expected 2 extensions, got %d", len(exts))
+		}
+		if exts[0] != "anthropics.claude-code" {
+			t.Errorf("expected first extension to be anthropics.claude-code, got %q", exts[0])
+		}
+		if exts[1] != "openai.chatgpt" {
+			t.Errorf("expected second extension to be openai.chatgpt, got %q", exts[1])
+		}
+	})
+
+	t.Run("no customizations when no extensions selected", func(t *testing.T) {
+		target := mustScaffold(t, TemplateData{
+			ProjectName:         "test-dc-no-ext",
+			Description:         "A test project",
+			IncludeDevContainer: true,
+			DevContainerImage:   "go:2-1.25-trixie",
+		})
+
+		dcPath := filepath.Join(target, ".devcontainer", "devcontainer.json")
+		raw, err := os.ReadFile(dcPath)
+		if err != nil {
+			t.Fatalf("devcontainer.json should exist: %v", err)
+		}
+
+		var dc DevContainer
+		if err := json.Unmarshal(raw, &dc); err != nil {
+			t.Fatalf("devcontainer.json is not valid JSON: %v", err)
+		}
+
+		if dc.Customizations != nil {
+			t.Error("customizations should be absent when no extensions are selected")
+		}
+	})
+}
+
 func TestEmptyDirectoryReuseSucceeds(t *testing.T) {
 	dir := t.TempDir()
 	target := filepath.Join(dir, "project")
