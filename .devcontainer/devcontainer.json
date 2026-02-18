@@ -6,14 +6,17 @@
 
   // Forward GitHub CLI token from host (set GH_TOKEN on host via: export GH_TOKEN=$(gh auth token)).
   "containerEnv": {
-    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+    "GH_TOKEN": "${localEnv:GH_TOKEN}",
+    "HOST_WORKSPACE": "${localWorkspaceFolder}"
   },
 
   // Mount host Claude storage to preserve conversations across host/container contexts.
+  // Extensions volume mounts to a staging path (not inside .vscode-server) to avoid
+  // Docker creating .vscode-server as root. A symlink connects it at startup via setup.sh.
   "mounts": [
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,readonly",
-    "source=seed-vscode-extensions,target=/home/vscode/.vscode-server/extensions,type=volume"
+    "source=seed-vscode-extensions,target=/home/vscode/.vscode-extensions-cache,type=volume"
   ],
 
   // Install extensions inside the dev container's remote extension host.
@@ -25,6 +28,5 @@
     }
   },
 
-  // Set up Claude project directory symlinks for host/container conversation sharing.
-  "postCreateCommand": "HOST_KEY=$(echo \"${localWorkspaceFolder}\" | tr '/' '-'); CONTAINER_KEY=$(echo /workspaces/seed | tr '/' '-'); mkdir -p \"$HOME/.claude/projects/$HOST_KEY\"; ln -sfn \"$HOME/.claude/projects/$HOST_KEY\" \"$HOME/.claude/projects/$CONTAINER_KEY\""
+  "postCreateCommand": "bash .devcontainer/setup.sh"
 }

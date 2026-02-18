@@ -38,8 +38,7 @@ type WizardData struct {
 	IncludeDevContainer bool   // Whether to scaffold .devcontainer/
 	DevContainerImage      string   // MCR image tag, e.g. "go:2-1.25-trixie"
 	AIChatContinuity       bool     // Whether to enable AI chat continuity
-	InstallAgentExtensions bool     // Whether to install coding agent VS Code extensions
-	AgentExtensions        []string // Selected extension IDs (e.g. "anthropics.claude-code")
+	AgentExtensions []string // Selected extension IDs (e.g. "anthropics.claude-code")
 }
 
 // RunWizard launches the interactive TUI wizard and collects user input.
@@ -126,31 +125,17 @@ func RunWizard(defaultName string) (WizardData, error) {
 				Title("Enable AI chat continuity?").
 				Description("Auto-detects Claude Code, Codex, etc. and preserves conversations in container").
 				Value(&data.AIChatContinuity),
-		).WithHideFunc(func() bool {
-			return !data.IncludeDevContainer
-		}),
 
-		// Group 4: Coding agent extensions (only shown if dev container opted in)
-		huh.NewGroup(
-			huh.NewConfirm().
-				Title("Install coding agent extensions?").
-				Description("Auto-installs selected VS Code extensions in the dev container").
-				Value(&data.InstallAgentExtensions),
-		).WithHideFunc(func() bool {
-			return !data.IncludeDevContainer
-		}),
-
-		// Group 5: Extension selection (only shown if agent extensions opted in)
-		huh.NewGroup(
 			huh.NewMultiSelect[string]().
-				Title("Which coding agent extensions?").
+				Title("Coding agent extensions").
+				Description("Auto-installs selected VS Code extensions in the dev container").
 				Options(
 					huh.NewOption("Claude Code", "anthropics.claude-code"),
 					huh.NewOption("Codex", "openai.chatgpt"),
 				).
 				Value(&data.AgentExtensions),
 		).WithHideFunc(func() bool {
-			return !data.InstallAgentExtensions
+			return !data.IncludeDevContainer
 		}),
 	)
 

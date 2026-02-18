@@ -46,6 +46,18 @@ Validated discoveries from building seed. Focus on what we proved, not opinions.
 
 ---
 
+### New Docker Volumes Don't Seed extensions.json
+
+**Topic**: DevContainer Setup
+
+**Insight**: Even after fixing the root ownership issue with the staging path + symlink pattern, VS Code throws `Unable to resolve nonexistent file '.vscode-server/extensions/extensions.json'` on first container start. A brand-new named volume is empty, so after the symlink is created pointing `.vscode-server/extensions` → `.vscode-extensions-cache`, the `extensions.json` file VS Code expects simply doesn't exist in the volume yet. The fix: after creating the symlink in `postCreateCommand`/`setup.sh`, conditionally initialize the file: `[ -f ...extensions.json ] || echo '[]' > ...extensions.json`. On subsequent starts the file is already there and gets skipped.
+
+**Validated by**: Persisted error after the staging/symlink fix was already in place. Root-caused by observing the error only on fresh volumes, not on rebuilds of existing ones.
+
+**Implication**: When symlinking into a named volume, never assume the volume has the files VS Code or other tools expect. Initialize required files defensively in `setup.sh`, not the Dockerfile — Dockerfile content is not copied into a volume on first mount when the mount target path was created via `mkdir` rather than a file copy.
+
+---
+
 ### AGENTS.md for Cross-Agent Compatibility
 
 **Topic**: Project Setup

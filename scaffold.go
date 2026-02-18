@@ -303,7 +303,8 @@ func (s *Scaffolder) scaffoldDevContainer(targetDir string, data TemplateData) e
 	// .vscode-server as root, which blocks VS Code from writing extensions.json and
 	// its bin/ and data/ siblings. A symlink connects the staging path at startup.
 	extensionsVolume := strings.ToLower(strings.ReplaceAll(data.ProjectName, " ", "-")) + "-vscode-extensions"
-	extensionsSymlink := "ln -sfn /home/vscode/.vscode-extensions-cache /home/vscode/.vscode-server/extensions"
+	extensionsSymlink := "ln -sfn /home/vscode/.vscode-extensions-cache /home/vscode/.vscode-server/extensions" +
+		"; [ -f /home/vscode/.vscode-extensions-cache/extensions.json ] || echo '[]' > /home/vscode/.vscode-extensions-cache/extensions.json"
 
 	dc := DevContainer{
 		Name:  fmt.Sprintf("%s (Dev Container)", data.ProjectName),
