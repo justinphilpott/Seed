@@ -68,7 +68,13 @@ seed skills ./myproject     # Install agent skills into existing project
 
 ### Dev containers
 
-Pick a language stack during the wizard and Seed generates a `.devcontainer/` config using [Microsoft Container Registry](https://mcr.microsoft.com) base images. If you enable AI chat continuity, a setup script auto-detects Claude Code and Codex and wires up conversation persistence so you keep your context across container rebuilds.
+Pick a language stack during the wizard and Seed generates a `.devcontainer/` config using [Microsoft Container Registry](https://mcr.microsoft.com) base images. `gh` CLI is pre-installed and authenticated via your host token — before opening the container, run:
+
+```bash
+export GH_TOKEN=$(gh auth token)
+```
+
+If you enable AI chat continuity, a setup script auto-detects Claude Code and Codex and wires up conversation persistence so you keep your context across container rebuilds.
 
 ### Skills
 

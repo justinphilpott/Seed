@@ -58,6 +58,18 @@ Validated discoveries from building seed. Focus on what we proved, not opinions.
 
 ---
 
+### gh CLI Auth in Devcontainers: Token Forwarding over Config Mount
+
+**Topic**: DevContainer Setup
+
+**Insight**: Mounting `~/.config/gh` read-only into a devcontainer appears to give gh CLI auth, but fails silently if the OAuth token needs refreshing — gh writes to the config directory during refresh, which is blocked by the readonly mount. The robust pattern is to forward `GH_TOKEN` (and `GITHUB_TOKEN` for Codespaces/CI) as environment variables instead; gh uses these directly without touching the config directory. The config mount can stay (writable) as a fallback for cases where the env vars aren't set, but env vars are the primary path.
+
+**Validated by**: Seed's own devcontainer and scaffolded devcontainers were both using a readonly config mount. Investigating why gh auth was unreliable in containers revealed the refresh-write failure mode. Fixed by removing `readonly`, adding `GH_TOKEN` and `GITHUB_TOKEN` forwarding, and surfacing the `export GH_TOKEN=$(gh auth token)` step in post-scaffold output and docs.
+
+**Implication**: For devcontainer gh auth, prefer env var forwarding (`GH_TOKEN`/`GITHUB_TOKEN`) over config file mounts. Always forward both — `GH_TOKEN` for interactive use, `GITHUB_TOKEN` for CI/Codespaces.
+
+---
+
 ### AGENTS.md for Cross-Agent Compatibility
 
 **Topic**: Project Setup

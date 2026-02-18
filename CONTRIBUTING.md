@@ -6,10 +6,16 @@ This guide covers development setup, architecture, and how to extend seed.
 
 ### 1. Open in DevContainer
 
-In VS Code:
+First, authenticate `gh` on your host so it's available inside the container:
+
+```bash
+export GH_TOKEN=$(gh auth token)
+```
+
+Then in VS Code:
 - **Command Palette** (`Ctrl+Shift+P`)
 - Type: **Dev Containers: Reopen in Container**
-- Wait for container to build (has Go pre-installed)
+- Wait for container to build (has Go and gh CLI pre-installed)
 
 ### 2. Install Dependencies
 
