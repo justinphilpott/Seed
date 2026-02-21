@@ -31,5 +31,5 @@ vendor/
 .DS_Store
 Thumbs.db
 
-# Local agent config
-.claude/
+# Local agent config (machine-specific, not project-wide)
+.claude/settings.local.json

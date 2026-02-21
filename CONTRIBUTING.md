@@ -98,8 +98,34 @@ The scaffold logic automatically strips `.tmpl` and renders with `TemplateData`.
 
 ### Add a New Skill
 
-1. Create `skills/your-skill.md`
-2. It's automatically embedded and installed by `seed skills`
+There are two categories of skill/command file — they live in different directories and serve different audiences:
+
+**Skills installed into target projects** (`skills/`):
+- Embedded in the binary at compile time via `//go:embed skills/*.md`
+- Copied to `targetDir/skills/` when seed scaffolds a new project
+- Intended for agents working inside a seeded project (e.g., `seed-feedback`, `doc-health-check`, `seed-ux-eval`)
+- To add: create `skills/your-skill.md` — it's automatically embedded and installed
+
+**Seed development slash commands** (`.claude/commands/`):
+- Claude Code slash commands for use while developing seed itself
+- Not embedded or installed anywhere — live only in this repo
+- Intended for the seed maintainer's workflow (e.g., `/test-scaffold`, `/triage-feedback`)
+- To add: create `.claude/commands/your-command.md`
+- Note: `.claude/settings.local.json` is gitignored (machine-local); commands are committed and travel with the repo
+
+## Feedback Loop
+
+Seed has a structured feedback loop for gathering UX signal from freshly seeded projects and translating it into improvements. The loop runs in three stages:
+
+**1. Evaluation** — `skills/seed-ux-eval.md` is installed into every seeded project. A fresh agent opening the project runs through a checklist to assess the scaffolding quality (first-5-minutes clarity, placeholder density, working practice fit, doc coherence). This produces an unbiased read on what works and what doesn't.
+
+**2. Submission** — When the evaluating agent finds something concrete, they use `skills/seed-feedback.md` to file a GitHub issue on this repo with the `agent-feedback` label.
+
+**3. Triage** — Before merging any change that affects the user surface (templates, wizard options, skill content), run `/triage-feedback` (Claude Code slash command). It fetches open `agent-feedback` issues, groups them by category, surfaces patterns, and presents a priority recommendation. You approve what to act on — nothing is acted on automatically.
+
+**Your place in the loop**: between stage 3 and any code change. Triage is the gate. Changes that would affect seeded projects should only land after considering open feedback on that surface.
+
+**Validation**: Before merging significant changes, run `/test-scaffold` to verify the test suite, build, and scaffold output across representative option combinations.
 
 ## Testing
 

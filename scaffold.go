@@ -96,6 +96,7 @@ type DevContainer struct {
 	Mounts            []string                    `json:"mounts,omitempty"`
 	ContainerEnv      map[string]string           `json:"containerEnv,omitempty"`
 	PostCreateCommand string                      `json:"postCreateCommand,omitempty"`
+	InitializeCommand string                      `json:"initializeCommand,omitempty"`
 }
 
 // Scaffolder handles template rendering and file generation.
@@ -369,11 +370,17 @@ func (s *Scaffolder) scaffoldDevContainer(targetDir string, data TemplateData) e
 
 	// If chat continuity enabled, mount all known AI tool dirs and generate setup script
 	if data.AIChatContinuity {
+		dirs := make([]string, 0, len(knownAITools))
 		for _, tool := range knownAITools {
 			dc.Mounts = append(dc.Mounts, fmt.Sprintf(
 				"source=${localEnv:HOME}/%s,target=/home/vscode/%s,type=bind,consistency=cached",
 				tool.StateDir, tool.StateDir))
+			dirs = append(dirs, "~/"+tool.StateDir)
 		}
+
+		// Pre-create AI tool state dirs on the host before Docker bind-mounts them.
+		// Without this, Docker creates missing dirs as root, causing permission failures.
+		dc.InitializeCommand = "mkdir -p " + strings.Join(dirs, " ")
 
 		dc.ContainerEnv["HOST_WORKSPACE"] = "${localWorkspaceFolder}"
 		dc.PostCreateCommand = "bash .devcontainer/setup.sh"

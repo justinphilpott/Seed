@@ -26,7 +26,8 @@ go vet ./...         # Static analysis
 - **wizard_test.go** — Wizard validation and data transformation tests
 - **skills.go** — Skill file embedding and installation logic
 - **templates/*.tmpl** — Embedded project templates (README, AGENTS, DECISIONS, TODO, LEARNINGS, Dockerfile)
-- **skills/*.md** — Embedded agent skill definitions (doc-health-check, seed-feedback)
+- **skills/*.md** — Agent skills embedded in the binary and installed into seeded projects (doc-health-check, seed-feedback, seed-ux-eval, entropy-guard)
+- **.claude/commands/*.md** — Slash commands for seed's own development workflow (test-scaffold, triage-feedback); not installed into target projects
 
 ## Key Patterns
 

@@ -21,6 +21,7 @@ Go CLI tool for rapid agentic POC scaffolding. Run `seed <directory>` to create 
 - **Check coherence before committing**: Skim project docs and verify they still agree with each other and with the code. Fix drift immediately — it compounds fast
 - **Capture learnings**: When you discover something non-obvious — a gotcha, a pattern that works, a workaround — add it to LEARNINGS.md. If it's not worth writing down, it wasn't a real learning
 - **Prune ruthlessly**: Replace placeholders with real content as soon as you can, or delete them. Stale scaffolding is worse than no scaffolding
+- **Entropy guard**: Before marking work as done, run the `entropy-guard` skill (`skills/entropy-guard.md`) to check for uncaptured decisions, learnings, doc drift, and stale placeholders. 2-5 minutes. Skip for trivial changes
 
 ## Project Constraints
 
@@ -39,7 +40,8 @@ Go CLI tool for rapid agentic POC scaffolding. Run `seed <directory>` to create 
 - **wizard_test.go** - Wizard validation and data transformation tests
 - **skills.go** - Skill file embedding and installation logic
 - **templates/*.tmpl** - Embedded project templates (README, AGENTS, DECISIONS, TODO, LEARNINGS, Dockerfile)
-- **skills/*.md** - Embedded agent skill definitions (doc-health-check, seed-feedback)
+- **skills/*.md** - Agent skills embedded in the binary and installed into seeded projects (doc-health-check, seed-feedback, seed-ux-eval, entropy-guard)
+- **.claude/commands/*.md** - Slash commands for seed's own development workflow (test-scaffold, triage-feedback); not installed into target projects
 
 ## Commands
 

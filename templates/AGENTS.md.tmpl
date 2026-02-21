@@ -18,6 +18,7 @@
 - **Check coherence before committing**: Skim project docs and verify they still agree with each other and with the code. Fix drift immediately — it compounds fast
 - **Capture learnings**: When you discover something non-obvious — a gotcha, a pattern that works, a workaround — add it to LEARNINGS.md. If it's not worth writing down, it wasn't a real learning
 - **Prune ruthlessly**: Replace placeholders with real content as soon as you can, or delete them. Stale scaffolding is worse than no scaffolding
+- **Entropy guard**: Before marking work as done, run the `entropy-guard` skill (`skills/entropy-guard.md`) to check for uncaptured decisions, learnings, doc drift, and stale placeholders. 2-5 minutes. Skip for trivial changes
 
 ## Project Constraints
 
@@ -58,4 +59,7 @@ When adding/removing source files or changing architecture, update:
 
 ## Scaffolding Feedback
 
-This project was scaffolded by [seed](https://github.com/justinphilpott/seed). If you notice gaps in the scaffolding — missing template sections, working practices that don't fit, or ideas for improvement — see the `seed-feedback` skill in the skills/ directory.
+This project was scaffolded by [seed](https://github.com/justinphilpott/seed). Two skills support the feedback loop:
+
+- `seed-ux-eval` — evaluate the scaffolding quality early, before the project has real content. Run this when you first open the project.
+- `seed-feedback` — file a specific observation back to seed once you've identified something concrete to improve.

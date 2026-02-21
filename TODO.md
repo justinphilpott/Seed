@@ -9,6 +9,8 @@ Active work tracking. Backlog and feature requests are managed as [GitHub Issues
 ## Next Up
 
 - [ ] Review and align `doc-health-check` skill with the information-coverage framing in LEARNINGS.md (audits coverage, not file presence)
+- [ ] Add scaffold_test.go coverage for `seed-ux-eval.md` and `entropy-guard.md` being present in the skills/ output (mirrors existing coverage for seed-feedback and doc-health-check)
+- [ ] Consider whether `/test-scaffold` command should include a step that runs `seed-ux-eval` on a freshly scaffolded temp project to close the evaluation loop automatically
 
 ## Backlog
 

@@ -87,3 +87,27 @@ Validated discoveries from building seed. Focus on what we proved, not opinions.
 **Topic**: Project Setup
 
 **Insight**: AGENTS.md is the most universal cross-agent context file — it's read by Claude Code, Codex, Copilot, and Cursor. Tool-specific files (.cursorrules, CODEX.md, etc.) add maintenance burden without proportional value for small projects. One well-maintained AGENTS.md plus a tool-specific file (e.g., CLAUDE.md) covers the landscape.
+
+---
+
+### Blanket .gitignore for Tool Directories Breaks Portability of Project-Level Config
+
+**Topic**: Project Setup
+
+**Insight**: When a tool directory (e.g., `.claude/`) starts out holding only machine-local files, blanket-ignoring the directory is tempting. This breaks as soon as project-level content (committed, shared, portable) is added alongside machine-local content — the blanket ignore silently excludes what should travel with the repo. The correct pattern: ignore only the specific machine-local files (e.g., `.claude/settings.local.json`), not the directory.
+
+**Validated by**: Seed initially gitignored `.claude/` entirely because it only held `settings.local.json`. After adding `.claude/commands/` (development slash commands that must be portable across machines), the blanket ignore would have made those commands invisible to anyone else checking out the repo. Fixed by tightening `.gitignore` to target the file, not the directory.
+
+**Implication**: When adding the first machine-local file to a tool directory, gitignore the specific file, not the directory. Assume project-level content will eventually live alongside it.
+
+---
+
+### Working Practice + Skill File = Habitual Agent Behaviour
+
+**Topic**: Agent Tooling Design
+
+**Insight**: A skill file alone requires explicit invocation — the agent must remember it exists, decide to use it, and actually invoke it. This makes skill-based behaviours feel like chores and easy to skip. Pairing a skill with a one-line working practice in AGENTS.md (which is always in context) converts the same behaviour into a standing instruction. The practice is the reliable trigger; the skill is the detail.
+
+**Validated by**: Entropy guard was initially conceived as a skill. Recognising that agents would only run it when they remembered to — making it no more reliable than the individual working practices it replaces — led to the two-part design: a brief practice ("run entropy-guard before marking work done") in AGENTS.md, with the full checklist in `skills/entropy-guard.md`. The practice ensures it happens; the skill ensures it's thorough.
+
+**Implication**: When designing agent-facing tools that should happen routinely (not just on demand), always pair the skill with a working practice entry. The practice encodes *when*; the skill encodes *how*. Either alone is weaker than both together.

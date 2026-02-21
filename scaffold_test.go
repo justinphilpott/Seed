@@ -146,6 +146,13 @@ func TestDevcontainerWithChatContinuity(t *testing.T) {
 		t.Errorf("wrong build.dockerfile: got %q", dc.Build.Dockerfile)
 	}
 
+	// Should have initializeCommand to pre-create AI tool dirs on host before Docker mounts them
+	for _, tool := range knownAITools {
+		if !strings.Contains(dc.InitializeCommand, tool.StateDir) {
+			t.Errorf("expected initializeCommand to reference %s, got %q", tool.StateDir, dc.InitializeCommand)
+		}
+	}
+
 	// Should have mounts for all known AI tools plus extensions volume
 	expectedMounts := len(knownAITools) + 1 // +1 for extensions volume
 	if len(dc.Mounts) != expectedMounts {

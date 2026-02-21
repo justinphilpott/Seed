@@ -75,3 +75,43 @@ Record architectural choices so future contributors (and agents) understand why.
 **Impact**: Less boilerplate, no unnecessary export boundaries. Revisit if we add a second binary, extract a library, or grow past ~3000 lines.
 
 ---
+
+### Two-tier tool structure: target-project skills vs. seed dev commands
+
+**Context**: Needed agent-facing tools at two distinct scopes — skills to install into projects seeded by seed (so agents in those projects have useful capabilities), and development tools for agents working on seed itself (to support the feedback loop and pre-change validation). Both are markdown instruction files for agents, so conflating them into one directory would make it unclear what gets installed where.
+**Decision**: `skills/` for target-project tools (embedded in the binary, installed during scaffolding); `.claude/commands/` for seed development slash commands (committed to the repo, available only when working on seed itself, never installed into target projects).
+**Impact**: Clear boundary: anything in `skills/` ships to every seeded project; anything in `.claude/commands/` is seed-internal. When adding a new agent-facing capability, the directory choice communicates the intended audience.
+
+---
+
+### Selective .gitignore for .claude/ — settings.local.json only
+
+**Context**: The `.claude/` directory initially contained only machine-local IDE settings (`settings.local.json`) and was blanket-gitignored. Adding `.claude/commands/` as seed development slash commands broke this assumption — those files need to be committed and travel with the repo across machines.
+**Decision**: Gitignore only `.claude/settings.local.json` (machine-specific) rather than the whole `.claude/` directory. Project-wide content (commands, shared settings) is committed normally.
+**Impact**: Development slash commands are portable across machines. Machine-local configuration remains excluded. This is the standard pattern for tools that have both per-project and per-machine configuration (cf. VS Code's `.vscode/settings.json` vs `.vscode/*.local.*`).
+
+---
+
+### Feedback loop gated on maintainer triage
+
+**Context**: Agent-feedback issues submitted by agents in seeded projects are a useful signal but require human judgement before becoming code changes. Unchecked, feedback could drive changes that benefit one project type while regressing others, or address noise rather than genuine gaps.
+**Decision**: The feedback loop is explicitly gated: `seed-ux-eval` (evaluation in target projects) → `seed-feedback` (submission to GH issues) → `/triage-feedback` (maintainer reviews and prioritises before any changes land). The `/triage-feedback` command makes no changes itself — it informs a decision that the maintainer takes.
+**Impact**: Prevents feedback from bypassing judgement. The triage step is where contradictory signals get resolved, project-specific noise gets filtered, and patterns across multiple reports get surfaced. Changes to the user surface (templates, wizard, skills) are only made after this gate.
+
+---
+
+### Entropy guard as working practice + skill, not skill alone
+
+**Context**: Needed post-work doc maintenance (capturing decisions, learnings, fixing drift) to happen naturally after every task, not as a separate chore agents forget. A skill alone requires explicit invocation — agents have to remember it exists and choose to run it.
+**Decision**: Two-part pattern: a one-line working practice in AGENTS.md states when and why (making it part of standing instructions always in context); a skill file provides the structured checklist for how. The practice is the trigger; the skill is the content.
+**Impact**: Agents following AGENTS.md working practices incorporate entropy-guard without needing to remember it separately. The skill can be as detailed as needed without cluttering the working practices list. The same pattern applies to any agent behaviour that should be habitual — encode the trigger in AGENTS.md, the detail in a skill file.
+
+---
+
+### seed-ux-eval uses a universal checklist, not persona scenarios
+
+**Context**: Considered two approaches for the fresh-perspective evaluation skill: persona-based (agent adopts a role — "you are a Python developer who just received this repo") vs. checklist-based (fixed questions applied regardless of project type).
+**Decision**: Checklist-based. Seed's templates are intentionally language-agnostic and minimal — the primary evaluation axis should be universal scaffolding quality (clarity, density, working practice fit), not language-specific expectations. Persona framing would add an order of magnitude of complexity and shift focus to the wrong axis.
+**Impact**: Consistent, comparable evaluations across any project type. Feedback is about the scaffold itself, not about what a specific kind of developer wants. Revisit if seed ever gains language-specific template variants.
+
+---
