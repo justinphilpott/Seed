@@ -1,26 +1,7 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# Local agent config
+.claude/settings.local.json
 
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool
-*.out
-
-# Go workspace file
-go.work
-
-# Compiled binary
-seed
-
-# Dependency directories (read-only caches)
-vendor/
-
-# IDEs
+# Editor and IDE state
 .vscode/
 .idea/
 *.swp
@@ -31,5 +12,6 @@ vendor/
 .DS_Store
 Thumbs.db
 
-# Local agent config (machine-specific, not project-wide)
-.claude/settings.local.json
+# Local generated scratch
+tmp/
+.tmp/

@@ -1,7 +1,0 @@
-FROM mcr.microsoft.com/devcontainers/go:2-1.25-trixie
-
-# Pre-create directories whose children will be volume/bind-mounted.
-# Docker creates missing parent dirs as root, which blocks VS Code server setup
-# and other tools that need to write alongside the mount points.
-RUN mkdir -p /home/vscode/.vscode-server /home/vscode/.vscode-extensions-cache /home/vscode/.config \
-    && chown vscode:vscode /home/vscode/.vscode-server /home/vscode/.vscode-extensions-cache /home/vscode/.config

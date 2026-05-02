@@ -1,92 +1,55 @@
 # Agent Context for Seed
 
-Go CLI tool for rapid agentic POC scaffolding. Run `seed <directory>` to create a new project with minimal, agent-friendly documentation files.
+Vendor-agnostic skill package for starting focused POCs. The primary product is `skills/poc-starter.md`, an interview-driven workflow that helps a user choose a proof-critical vertical and set up the smallest useful local context system.
 
 ## Quick Links
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Development setup, architecture, template variables, extending seed
-- [DECISIONS.md](DECISIONS.md) - Architectural decisions and rationale
+- [README.md](README.md) - Project overview and usage
+- [skills/poc-starter.md](skills/poc-starter.md) - Primary POC starter workflow
+- [skills/poc-iteration-guard.md](skills/poc-iteration-guard.md) - Iteration coherence and drift check
+- [skills/context-health-check.md](skills/context-health-check.md) - POC context coverage audit
+- [DECISIONS.md](DECISIONS.md) - Product and repository decisions
+- [LEARNINGS.md](LEARNINGS.md) - Validated discoveries
 - [TODO.md](TODO.md) - Active work and next steps
-- [LEARNINGS.md](LEARNINGS.md) - Validated discoveries across both layers (see below)
-
-## Quick Reference
-
-```bash
-go mod tidy          # Install/update dependencies
-go run .             # Run without building
-make build           # Build binary with version injection
-make test            # Run tests
-go fmt ./...         # Format code
-go vet ./...         # Static analysis
-```
 
 ## Working Practices
 
-- **Small, atomic commits**: One logical change per commit. If you can't summarise it in a sentence, break it up
-- **Commit early, commit often**: Working code with tests beats perfect code in progress. Small commits are easy to review, revert, and understand in git log
-- **TODO.md as live context**: Before starting work, write what you're doing in TODO.md's "Doing Now" section — enough detail to resume if interrupted or context is lost. When the work is complete, derive your commit message from those items, then clear the section
-- **Docs travel with code**: If a change affects how the project works, update the relevant docs in the same commit — not later
-- **Check coherence before committing**: Skim project docs and verify they still agree with each other and with the code. Fix drift immediately — it compounds fast
-- **Capture learnings**: When you discover something non-obvious — a gotcha, a pattern that works, a workaround — add it to LEARNINGS.md. If it's not worth writing down, it wasn't a real learning
-- **Prune ruthlessly**: Replace placeholders with real content as soon as you can, or delete them. Stale scaffolding is worse than no scaffolding
-- **Entropy guard**: Before committing non-trivial work, run `skills/entropy-guard.md` in full — don't shortcut it. It ensures the project's docs remain coherent and self-referential with what was just built
+- **Keep the skill vendor-agnostic**: Do not assume a specific agent runtime, IDE, package manager, or hosted service unless a skill explicitly asks the user.
+- **Preserve intent over structure**: File names can change. The important coverage is intent, proof target, evidence, decisions, non-goals, and next proof step.
+- **Challenge accidental product scope**: Changes that turn a POC into an app should be challenged and mined for learnings before being accepted.
+- **Keep examples illustrative**: Examples should show quality and shape without becoming rigid templates.
+- **Use support skills only when useful**: Add or recommend targeted support skills when they preserve signal; do not create generic ceremony.
+- **Docs travel with skill changes**: If a skill changes the product behavior, update README, DECISIONS, LEARNINGS, or TODO as appropriate.
+- **Run a context check before finishing meaningful work**: Use `skills/context-health-check.md` on this repo's own docs when changes affect the skill surface.
 
 ## Project Constraints
 
-- Single external dependency (Charm's Huh library for TUI)
-- Templates embedded at compile time via `//go:embed templates/*.tmpl`
-- Devcontainer JSON generated programmatically (encoding/json), not via text/template
-- Separation of concerns: wizard collects input, scaffold writes files, main orchestrates
-- Version injected at build time via `-ldflags "-X main.Version=$(VERSION)"`
+- No binary implementation or installer.
+- No generated template pack as the primary abstraction.
+- Markdown-first, portable skill instructions.
+- `AGENTS.md` is canonical cross-agent context.
+- Proprietary or tool-specific files should point here rather than duplicate guidance.
 
 ## Key Files
 
-- **main.go** - CLI entry point, argument parsing, orchestration
-- **main_test.go** - CLI argument parsing and output formatting tests
-- **wizard.go** - TUI wizard (Charm Huh), user input collection
-- **scaffold.go** - Template rendering (embed.FS + text/template), devcontainer generation, .vscode/extensions.json generation
-- **scaffold_test.go** - Scaffold/template tests
-- **wizard_test.go** - Wizard validation and data transformation tests
-- **skills.go** - Skill file embedding and installation logic
-- **templates/*.tmpl** - Embedded project templates (README, AGENTS, DECISIONS, TODO, LEARNINGS, Dockerfile)
-- **skills/*.md** - Skills installed into every seeded project (doc-health-check, entropy-guard, seed-feedback, seed-ux-eval)
-- **skills/dev/*.md** - Seed development workflow skills; not embedded, not installed into seeded projects
-- **.claude/commands/*.md** - Symlinks into skills/dev/ so Claude Code can expose them as slash commands
+- `skills/poc-starter.md`: primary skill for interviewing, advising on the POC vertical, and planning or creating local starter files.
+- `skills/poc-iteration-guard.md`: optional support skill for end-of-iteration coherence, evidence, decisions, and drift handling.
+- `skills/context-health-check.md`: optional support skill for auditing whether POC context preserves the proof state.
+- `examples/poc-starter-output.md`: compact example of interview synthesis and proposed output.
+- `README.md`: public usage and philosophy.
+- `DECISIONS.md`: why the repo pivoted from CLI to skill package and how the new surface is shaped.
+- `LEARNINGS.md`: validated insights that should influence future skill changes.
+- `TODO.md`: active migration/follow-up context.
 
-## Testing
+## Validation
 
-- `make test` or `go test -count=1 ./...`
-- Table-driven tests with `t.Run()` subtests
-- Temp directory isolation via `tempDir(t)` helper
+There is no build or test suite after the hard pivot. Validate changes by:
 
-## Meta: Seed Documents What It Builds
+- Reading the changed skills end to end.
+- Checking links and file references in README and AGENTS.
+- Running `skills/context-health-check.md` against this repo's docs for meaningful user-surface changes.
+- Running `git diff --check` before committing.
 
-Seed scaffolds agentic docs for other projects (`templates/*.tmpl`) and also maintains its own agentic docs for development. These are two layers of the same philosophy — insights from improving one should inform the other.
+## Archive
 
-- **Seed's templates** — starter docs for new projects (AGENTS.md, README.md, DECISIONS.md, TODO.md, LEARNINGS.md)
-- **Seed's own docs** — mature docs for this project (AGENTS.md, CONTRIBUTING.md, LEARNINGS.md)
-
-When recording learnings, note which layer they apply to — or both. See [LEARNINGS.md](LEARNINGS.md).
-
-## Branch
-
-Main branch: `main`. Feature branches are cut from `main` and merged via PR.
-
-## Releasing
-
-Push a git tag to trigger automatic cross-platform builds via GitHub Actions:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-Builds for Linux/macOS (amd64/arm64) and Windows (amd64) are published as GitHub Releases.
-
-## Maintaining These Docs
-
-When adding/removing source files, templates, or changing architecture, update:
-- The **Key Files** section in this file
-- The **Architecture** section in CONTRIBUTING.md
-
-When making architectural decisions, add an entry to DECISIONS.md.
+The old Go CLI state is preserved at local tag `cli-archive-2026-05-02`. Do not reintroduce CLI implementation files unless the product direction changes explicitly.

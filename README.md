@@ -1,106 +1,49 @@
-# 🌱 Seed
+# Seed
 
-A tiny CLI scaffolding tool that "seeds" a directory with a useful set of documentation files (human and agent-friendly) and other minimally opinionated structures to support a proof-of-concept build.
+Seed is now a vendor-agnostic skill package for starting short-lived proof-of-concept work.
 
-## Quick start
+The old Go CLI tried to encode a flexible human intent-gathering exercise into a rigid binary, then produced a small set of generic files. That was the wrong abstraction. The useful artifact is the interview and judgment: clarify what needs proving, choose a good vertical slice, preserve intent, and set up just enough local context for a few dozen POC iterations.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/justinphilpott/seed/main/install.sh | sh && export PATH="$HOME/.local/bin:$PATH" && seed myproject
+The pre-pivot CLI state is preserved locally at tag `cli-archive-2026-05-02`.
+
+## Use
+
+Ask an agent with access to this repo to use the primary skill:
+
+```text
+Use skills/poc-starter.md to help me plan or create a local POC starter.
 ```
 
-## What you get
+The skill will ask whether you want:
 
-- **Agent-ready docs** — AGENTS.md, TODO.md, DECISIONS.md, LEARNINGS.md pre-wired for AI-assisted development
-- **Optional dev container** — language-specific base image with `gh` CLI (via devcontainer feature), authenticated via host token
-- **AI chat continuity** — setup script persists conversation context across container rebuilds
-- **Agent skills** — reusable markdown procedures (`doc-health-check`, `entropy-guard`, ...) installed into `skills/`
-- **No bloat** — just enough structure to grow into
+- Quick, standard, or thorough discovery.
+- A plan only, or direct creation of POC support files.
+- Docs/context only, or an optional minimal runnable skeleton.
+- A target location inferred from context or explicitly provided.
 
-```
-myproject/
-├── README.md            Human entry point — what this project is and how to run it
-├── AGENTS.md            Context and constraints for AI agents working in the repo
-├── DECISIONS.md         Lightweight architectural decision log
-├── TODO.md              Active work items and next steps
-├── LEARNINGS.md         Validated discoveries worth preserving
-├── .gitignore           Git ignore rules (language-aware)
-├── .editorconfig        Editor formatting defaults
-├── LICENSE              Open-source license (optional)
-├── skills/              Reusable agent skill files
-├── .vscode/             (optional, with devcontainer + extensions)
-│   └── extensions.json  Prompts VS Code to install recommended extensions
-└── .devcontainer/       (optional)
-    ├── Dockerfile       Language-specific base image
-    ├── devcontainer.json
-    └── setup.sh         AI chat continuity (optional, with chat continuity)
-```
+## What It Optimizes For
 
-Every file is a starting point, not a finished document. Fill them in as you build.
+- A proof-critical vertical slice, not an accidental MVP.
+- A falsifiable hypothesis and clear definition of done.
+- Explicit non-goals and scope boundaries.
+- Preservation of intent, evidence, decisions, and current proof state.
+- Drift resistance when the POC starts turning into a full app.
+- Small, useful context files instead of template volume.
 
-## Install
+## Skills
 
-### Quick install (Linux/macOS)
+- `skills/poc-starter.md`: primary interview-to-plan/create workflow.
+- `skills/poc-iteration-guard.md`: end-of-iteration intent, evidence, decision, and drift check.
+- `skills/context-health-check.md`: audit whether a fresh agent can recover the POC proof state.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/justinphilpott/seed/main/install.sh | sh && export PATH="$HOME/.local/bin:$PATH"
-```
+## Examples
 
-Install to a custom directory:
+- `examples/poc-starter-output.md`: illustrative output shape for a POC starter interview. It is not a template to copy mechanically.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/justinphilpott/seed/main/install.sh | INSTALL_DIR=/usr/local/bin sh
-```
+## Repository Shape
 
-### From source
-
-```bash
-go install github.com/justinphilpott/seed@latest
-```
-
-### From release binaries
-
-Download the binary for your platform from [GitHub Releases](https://github.com/justinphilpott/seed/releases), then:
-
-```bash
-chmod +x seed-linux-amd64
-mv seed-linux-amd64 ~/.local/bin/seed
-seed --version
-```
-
-Available binaries: `linux-amd64`, `linux-arm64`, `darwin-amd64`, `darwin-arm64`, `windows-amd64`.
-
-## Usage
-
-```bash
-seed myproject              # Scaffold a new project
-seed ~/dev/myapp            # Absolute paths work too
-seed .                      # Use current directory (prompts if non-empty)
-```
-
-### Dev containers
-
-Pick a language stack during the wizard and Seed generates a `.devcontainer/` config using [Microsoft Container Registry](https://mcr.microsoft.com) base images. `gh` CLI is included via a [devcontainer feature](https://github.com/devcontainers/features) and authenticated via your host token — before opening the container, run:
-
-```bash
-export GH_TOKEN=$(gh auth token)
-```
-
-If you enable AI chat continuity, a setup script auto-detects Claude Code and Codex and wires up conversation persistence so you keep your context across container rebuilds.
-
-### Skills
-
-Skills are markdown files that define reusable procedures your AI agent can follow. They are installed automatically into `skills/` when you scaffold a project.
-
-Currently ships with:
-- `doc-health-check` — an audit that reviews your project's documentation coverage and flags gaps
-- `entropy-guard` — checks that docs remain coherent and self-consistent before committing
-- `seed-ux-eval` — first-5-minutes evaluation of scaffolding quality from a fresh agent's perspective
-- `seed-feedback` — an optional channel for agents to submit suggestions back to seed when they notice gaps in the scaffolding
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, architecture, and how to extend seed.
+This repo intentionally contains no binary implementation, installer, embedded templates, or release workflow. It is a small skill package plus documentation about the product philosophy and maintenance loop.
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE).

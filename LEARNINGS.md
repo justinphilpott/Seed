@@ -1,113 +1,63 @@
 # Learnings
 
-Validated discoveries from building seed. Focus on what we proved, not opinions.
+Validated discoveries from shaping Seed as a POC starter skill package.
 
 ---
 
-### Information Coverage > File Presence
+### Intent-heavy scaffolding should be a skill, not a rigid binary
 
-**Topic**: Documentation Architecture
+**Topic**: Product Shape
 
-**Insight**: Agent-friendly docs need to cover the right *categories* of information — temporal context (what changed and why), constraints and decisions, code-spatial mapping (what's where and how it connects), active work, and learnings. The specific files are containers; the coverage is what matters. A project's docs will naturally diverge from any starter set as files merge, split, or migrate to serve real needs. That's healthy — the test is "can an agent find the decisions?" not "do you have a DECISIONS.md?"
+**Insight**: The valuable part of Seed is not file emission. It is interviewing the user, narrowing the proof target, challenging accidental app scope, and preserving context over iterations. A binary made that flexible judgment harder to maintain.
 
-**Validated by**: Seed's own doc set (CLAUDE.md, AGENTS.md, CONTRIBUTING.md, LEARNINGS.md) differs from what it scaffolds for users (AGENTS.md, README.md, DECISIONS.md, TODO.md, LEARNINGS.md). Every information category is covered in both, just in different containers. Seed's CONTRIBUTING.md absorbed what separate build and context docs would cover.
+**Validated by**: The migration interview showed that the desired output depends on POC depth, target path, plan vs create mode, docs vs runnable skeleton, and the user's proof uncertainty. Those choices are better handled by an adaptive skill.
 
-**Implication**: Templates should scaffold *structure to grow into*, not a prescriptive file set. Doc health tools should audit informational coverage, not file presence.
-
----
-
-### Maintenance Instructions Prevent Doc Drift
-
-**Topic**: Documentation Architecture
-
-**Insight**: Without explicit "when X changes, update Y" instructions in the docs themselves, agents silently let docs go stale. Baking a maintenance section into project docs from creation is more effective than retrofitting it later.
-
-**Validated by**: Seed's own docs had drifted — missing files in architecture lists, stale references, removed fields still documented. Adding maintenance checklists to CLAUDE.md, CONTRIBUTING.md, and AGENTS.md fixed this. The AGENTS.md template now includes the pattern so scaffolded projects inherit it from day one. Reinforced a second time when a doc sync found DECISIONS.md missing seven decisions, TODO.md not existing at all, and branch references stale — on the project that teaches these practices.
+**Implication**: Future work should improve the skill workflow and examples, not rebuild generic scaffolding logic.
 
 ---
 
-### Brittle References Accelerate Drift
+### A good POC starts with the vertical, not the file set
 
-**Topic**: Documentation Architecture
+**Topic**: POC Design
 
-**Insight**: Line-number references in docs (e.g., `scaffold.go:28-35`) go stale as soon as code changes. Function and type name references (`the TemplateData struct in scaffold.go`) are stable anchors that survive refactoring. Prefer semantic references over positional ones.
+**Insight**: The skill must help advise on what makes a good vertical slice. Weak verticals often describe implementation layers or product areas instead of proof-critical learning.
 
----
+**Validated by**: During planning, the strongest tangent was that Seed should help identify a proof-critical, falsifiable, observable, decision-driving vertical before creating any files.
 
-### Docker Volume Mounts Inside Nested Paths Create Root Ownership
-
-**Topic**: DevContainer Setup
-
-**Insight**: Mounting a Docker volume at a nested path like `.vscode-server/extensions` causes Docker to create the parent `.vscode-server/` as root. This blocks VS Code from writing sibling files (`extensions.json`, `bin/`, `data/`). The fix is a two-step pattern: mount the volume to a staging path outside the sensitive parent (e.g., `.vscode-extensions-cache`), then symlink it into place at container startup. The Dockerfile must pre-create the staging dir with correct ownership so the volume mount inherits it.
-
-**Validated by**: Seed's own devcontainer hit this exact issue — VS Code couldn't read `extensions.json`. Fixed in commit `35fce36` for seed's own container, then ported to the scaffold code that generates devcontainers for new projects.
-
-**Implication**: When mounting volumes inside paths owned by non-root users, never mount into a subdirectory of a directory the user needs to write to. Use a staging path + symlink instead.
+**Implication**: `poc-starter` includes candidate vertical generation, scoring, recommendation, and direct challenge questions.
 
 ---
 
-### New Docker Volumes Don't Seed extensions.json
+### Information coverage still matters more than file presence
 
-**Topic**: DevContainer Setup
+**Topic**: Context Systems
 
-**Insight**: Even after fixing the root ownership issue with the staging path + symlink pattern, VS Code throws `Unable to resolve nonexistent file '.vscode-server/extensions/extensions.json'` on first container start. A brand-new named volume is empty, so after the symlink is created pointing `.vscode-server/extensions` → `.vscode-extensions-cache`, the `extensions.json` file VS Code expects simply doesn't exist in the volume yet. The fix: after creating the symlink in `postCreateCommand`/`setup.sh`, conditionally initialize the file: `[ -f ...extensions.json ] || echo '[]' > ...extensions.json`. On subsequent starts the file is already there and gets skipped.
+**Insight**: Agent-friendly POC context needs to preserve original intent, current proof step, decisions, evidence, non-goals, and drift history. The specific files are containers.
 
-**Validated by**: Persisted error after the staging/symlink fix was already in place. Root-caused by observing the error only on fresh volumes, not on rebuilds of existing ones.
+**Validated by**: The migration kept the earlier documentation insight but changed the default file set. `poc-starter` now chooses files based on the POC's needs rather than copying a fixed template set.
 
-**Implication**: When symlinking into a named volume, never assume the volume has the files VS Code or other tools expect. Initialize required files defensively in `setup.sh`, not the Dockerfile — Dockerfile content is not copied into a volume on first mount when the mount target path was created via `mkdir` rather than a file copy.
-
----
-
-### gh CLI Auth in Devcontainers: Don't Mount ~/.config/gh
-
-**Topic**: DevContainer Setup
-
-**Insight**: Mounting `~/.config/gh` from the host into a devcontainer causes gh to fail fatally with `"failed to migrate config: couldn't find oauth token: exec: dbus-launch: not found"` — even when `GH_TOKEN` is set. The root cause: modern gh stores oauth tokens in the host system keyring (dbus/gnome-keyring), not inline in `hosts.yml`. When gh starts in the container it reads the mounted config, attempts the multi-account migration, tries to read the token from the keyring via `dbus-launch`, finds it absent, and refuses to continue — before ever checking `GH_TOKEN`. The fix is to not mount `~/.config/gh` at all. `GH_TOKEN` forwarding alone is sufficient; gh uses it directly without needing any config file.
-
-**Validated by**: Confirmed by setting `GH_CONFIG_DIR=/tmp/gh-test` (clean dir, no host config) — `gh auth status` works immediately with just `GH_TOKEN`. Inspecting the mounted `hosts.yml` showed `oauth_token` absent from the file (stored in keyring instead). Fixed in seed's own devcontainer and scaffold output by removing the `~/.config/gh` bind mount.
-
-**Implication**: Never mount `~/.config/gh` from a host that uses the system keyring for token storage. Forward `GH_TOKEN` (and `GITHUB_TOKEN` for Codespaces/CI) as env vars only. The container will create its own clean config on first use.
+**Implication**: Context health checks should audit whether a fresh agent can recover the proof state, not whether specific filenames exist.
 
 ---
 
-### Dogfooding a Doc-Generation Tool Has an Inherent Lag
+### Scope creep is evidence about framing
 
-**Topic**: Documentation Architecture
+**Topic**: POC Iteration
 
-**Insight**: A tool that generates doc conventions for other projects cannot perfectly follow those conventions itself in real time. The tool's own docs represent a matured, evolved state; its templates represent the current best-guess starting point for new projects. They diverge naturally as the conventions are refined through use, and converge again through periodic sync — not continuous parity. The gap is a signal that the conventions are evolving healthily, not a maintenance failure.
+**Insight**: When a user wants to expand or redirect a POC, the agent should not only resist. It should ask what the desired change reveals about the original hypothesis, missing constraints, or process that led to the POC.
 
-**Validated by**: Seed's own docs repeatedly drifted from what seed scaffolds for users. The conventions in the templates were being improved faster than seed's own files were being updated. Trying to maintain perfect real-time parity is impractical when the output is itself being designed.
+**Validated by**: The migration discussion emphasized challenging full-app scope while extracting learnings from why the new scope feels necessary.
 
-**Implication**: For tools in this class, schedule periodic coherence checks (e.g., run `doc-health-check` on seed itself) rather than expecting continuous sync. Accept that the project's own docs will lag the templates — what matters is that both layers cover the same informational categories, not that they use identical structure.
-
----
-
-### AGENTS.md for Cross-Agent Compatibility
-
-**Topic**: Project Setup
-
-**Insight**: AGENTS.md is the most universal cross-agent context file — it's read by Claude Code, Codex, Copilot, and Cursor. Tool-specific files (.cursorrules, CODEX.md, etc.) add maintenance burden without proportional value for small projects. One well-maintained AGENTS.md plus a tool-specific file (e.g., CLAUDE.md) covers the landscape.
+**Implication**: `poc-starter` and `poc-iteration-guard` treat material divergence as signal to examine before accepting a pivot.
 
 ---
 
-### Blanket .gitignore for Tool Directories Breaks Portability of Project-Level Config
+### Examples should preserve quality without freezing structure
 
-**Topic**: Project Setup
+**Topic**: Skill Maintenance
 
-**Insight**: When a tool directory (e.g., `.claude/`) starts out holding only machine-local files, blanket-ignoring the directory is tempting. This breaks as soon as project-level content (committed, shared, portable) is added alongside machine-local content — the blanket ignore silently excludes what should travel with the repo. The correct pattern: ignore only the specific machine-local files (e.g., `.claude/settings.local.json`), not the directory.
+**Insight**: A compact example helps future agents understand the intended output quality, but a full generated scaffold risks becoming a de facto template.
 
-**Validated by**: Seed initially gitignored `.claude/` entirely because it only held `settings.local.json`. After adding `.claude/commands/` (development slash commands that must be portable across machines), the blanket ignore would have made those commands invisible to anyone else checking out the repo. Fixed by tightening `.gitignore` to target the file, not the directory.
+**Validated by**: The migration chose one illustrative output example rather than multiple complete generated projects.
 
-**Implication**: When adding the first machine-local file to a tool directory, gitignore the specific file, not the directory. Assume project-level content will eventually live alongside it.
-
----
-
-### Working Practice + Skill File = Habitual Agent Behaviour
-
-**Topic**: Agent Tooling Design
-
-**Insight**: A skill file alone requires explicit invocation — the agent must remember it exists, decide to use it, and actually invoke it. This makes skill-based behaviours feel like chores and easy to skip. Pairing a skill with a one-line working practice in AGENTS.md (which is always in context) converts the same behaviour into a standing instruction. The practice is the reliable trigger; the skill is the detail.
-
-**Validated by**: Entropy guard was initially conceived as a skill. Recognising that agents would only run it when they remembered to — making it no more reliable than the individual working practices it replaces — led to the two-part design: a brief practice ("run entropy-guard before marking work done") in AGENTS.md, with the full checklist in `skills/entropy-guard.md`. The practice ensures it happens; the skill ensures it's thorough.
-
-**Implication**: When designing agent-facing tools that should happen routinely (not just on demand), always pair the skill with a working practice entry. The practice encodes *when*; the skill encodes *how*. Either alone is weaker than both together.
+**Implication**: Keep examples short, annotated, and explicitly non-prescriptive.
