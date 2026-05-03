@@ -52,4 +52,4 @@ There is no build or test suite after the hard pivot. Validate changes by:
 
 ## Archive
 
-The old Go CLI state is preserved at local tag `cli-archive-2026-05-02`. Do not reintroduce CLI implementation files unless the product direction changes explicitly.
+The old Go CLI state is preserved at tag `cli-archive-2026-05-02`. Do not reintroduce CLI implementation files unless the product direction changes explicitly.

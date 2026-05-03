@@ -2,9 +2,7 @@
 
 Seed is now a vendor-agnostic skill package for starting short-lived proof-of-concept work.
 
-The old Go CLI tried to encode a flexible human intent-gathering exercise into a rigid binary, then produced a small set of generic files. That was the wrong abstraction. The useful artifact is the interview and judgment: clarify what needs proving, choose a good vertical slice, preserve intent, and set up just enough local context for a few dozen POC iterations.
-
-The pre-pivot CLI state is preserved locally at tag `cli-archive-2026-05-02`.
+The useful artifact is the interview and judgment: clarify what needs proving, choose a good vertical slice, preserve intent, and set up just enough local context for a few dozen POC iterations.
 
 ## Use
 
@@ -42,8 +40,12 @@ The skill will ask whether you want:
 
 ## Repository Shape
 
-This repo intentionally contains no binary implementation, installer, embedded templates, or release workflow. It is a small skill package plus documentation about the product philosophy and maintenance loop.
+This repo is intentionally small: a skill package plus documentation about the product philosophy and maintenance loop.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Archive
+
+Seed used to be a Go CLI that encoded a flexible human intent-gathering exercise into a rigid binary, then produced a small set of generic files. That was the wrong abstraction for this problem. The pre-pivot CLI state is preserved at tag `cli-archive-2026-05-02`.

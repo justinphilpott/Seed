@@ -18,9 +18,9 @@ Record product and repository decisions so future agents understand why Seed is 
 
 **Context**: The CLI was useful history even though it is no longer the desired abstraction.
 
-**Decision**: Preserve the pre-pivot CLI state with local tag `cli-archive-2026-05-02`, then remove binary implementation files from `main`.
+**Decision**: Preserve the pre-pivot CLI state with tag `cli-archive-2026-05-02`, then remove binary implementation files from `main`.
 
-**Impact**: The repo can cut down hard without losing a recovery point. The archive tag is local unless explicitly pushed.
+**Impact**: The repo can cut down hard without losing a recovery point. The archive tag is available on the remote for future reference.
 
 ---
 
