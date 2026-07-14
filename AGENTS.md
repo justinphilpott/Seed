@@ -8,6 +8,7 @@ Vendor-agnostic skill package for starting focused POCs. The primary product is 
 - [skills/poc-starter.md](skills/poc-starter.md) - Primary POC starter workflow
 - [skills/poc-iteration-guard.md](skills/poc-iteration-guard.md) - Iteration coherence and drift check
 - [skills/context-health-check.md](skills/context-health-check.md) - POC context coverage audit
+- [skills/seed-coherence-guard.md](skills/seed-coherence-guard.md) - Repo-specific coherence guard
 - [DECISIONS.md](DECISIONS.md) - Product and repository decisions
 - [LEARNINGS.md](LEARNINGS.md) - Validated discoveries
 - [TODO.md](TODO.md) - Active work and next steps
@@ -20,7 +21,7 @@ Vendor-agnostic skill package for starting focused POCs. The primary product is 
 - **Keep examples illustrative**: Examples should show quality and shape without becoming rigid templates.
 - **Use support skills only when useful**: Add or recommend targeted support skills when they preserve signal; do not create generic ceremony.
 - **Docs travel with skill changes**: If a skill changes the product behavior, update README, DECISIONS, LEARNINGS, or TODO as appropriate.
-- **Run a context check before finishing meaningful work**: Use `skills/context-health-check.md` on this repo's own docs when changes affect the skill surface.
+- **Run the coherence guard before finishing meaningful work**: Use `skills/seed-coherence-guard.md` when changes affect Seed's skill surface, docs, examples, or maintenance loop.
 
 ## Project Constraints
 
@@ -35,6 +36,7 @@ Vendor-agnostic skill package for starting focused POCs. The primary product is 
 - `skills/poc-starter.md`: primary skill for interviewing, advising on the POC vertical, and planning or creating local starter files.
 - `skills/poc-iteration-guard.md`: optional support skill for end-of-iteration coherence, evidence, decisions, and drift handling.
 - `skills/context-health-check.md`: optional support skill for auditing whether POC context preserves the proof state.
+- `skills/seed-coherence-guard.md`: repo-specific guard for preventing product-surface drift while changing Seed.
 - `examples/poc-starter-output.md`: compact example of interview synthesis and proposed output.
 - `README.md`: public usage and philosophy.
 - `DECISIONS.md`: why the repo pivoted from CLI to skill package and how the new surface is shaped.
@@ -47,7 +49,7 @@ There is no build or test suite after the hard pivot. Validate changes by:
 
 - Reading the changed skills end to end.
 - Checking links and file references in README and AGENTS.
-- Running `skills/context-health-check.md` against this repo's docs for meaningful user-surface changes.
+- Running `skills/seed-coherence-guard.md` for meaningful user-surface changes.
 - Running `git diff --check` before committing.
 
 ## Archive

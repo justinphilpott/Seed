@@ -33,6 +33,7 @@ The skill will ask whether you want:
 - `skills/poc-starter.md`: primary interview-to-plan/create workflow.
 - `skills/poc-iteration-guard.md`: end-of-iteration intent, evidence, decision, and drift check.
 - `skills/context-health-check.md`: audit whether a fresh agent can recover the POC proof state.
+- `skills/seed-coherence-guard.md`: repo-specific guard for keeping Seed's skill surface coherent.
 
 ## Examples
 

@@ -58,9 +58,9 @@ Record product and repository decisions so future agents understand why Seed is 
 
 **Context**: Signal clarity over time matters, but installing generic process files can create ceremony.
 
-**Decision**: Keep two reusable support skills in this repo: `poc-iteration-guard.md` and `context-health-check.md`. `poc-starter` may propose copying or adapting support skills into a target POC when they clearly help.
+**Decision**: Keep reusable POC support skills targeted: `poc-iteration-guard.md` and `context-health-check.md`. Keep `seed-coherence-guard.md` repo-specific, for maintaining Seed itself. `poc-starter` may propose copying or adapting support skills into a target POC when they clearly help.
 
-**Impact**: The repo preserves the useful loop from the old entropy/doc-health ideas without forcing every POC to carry the same support files.
+**Impact**: The repo preserves the useful loop from the old entropy/doc-health ideas without forcing every POC to carry the same support files or leaking Seed's own maintenance guard into generated POCs.
 
 ---
 
